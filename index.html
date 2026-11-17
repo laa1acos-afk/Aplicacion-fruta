@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2f6b3b">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Costos, análisis, cotización e informe · Fruta deshidratada</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #1f2a1f; --muted: #6b7a6b;
+    --accent: #d9622b; --accent-2: #2f6b3b; --line: #e3e0d8; --warn: #b5482a;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--ink); line-height: 1.4; }
+  header { background: var(--accent-2); color: #fff; padding: 18px 24px; }
+  header h1 { margin: 0; font-size: 1.4rem; }
+  header p { margin: 4px 0 0; opacity: .85; font-size: .9rem; }
+  nav.tabs { max-width: 900px; margin: 0 auto; padding: 14px 20px 0; display: flex; gap: 8px; }
+  nav.tabs button { background: #fff; color: var(--accent-2); border: 1px solid var(--accent-2); }
+  nav.tabs button.active { background: var(--accent-2); color: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px 20px 20px; }
+  section.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+                 padding: 16px; margin-bottom: 16px; }
+  section.card h2 { margin: 0 0 12px; font-size: 1.05rem; color: var(--accent-2); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  label { display: flex; flex-direction: column; font-size: .85rem; color: var(--muted); gap: 4px; }
+  input, select { font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+                  border-radius: 6px; color: var(--ink); background: #fff; width: 100%; }
+  input[readonly] { background: #f3f1ec; }
+  input:focus, select:focus { outline: 2px solid var(--accent-2); border-color: transparent; }
+  .hint { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .78rem; color: var(--muted); font-weight: 600; }
+  td input { padding: 6px 8px; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  button { font: inherit; padding: 8px 14px; border-radius: 6px; border: 0; cursor: pointer;
+           background: var(--accent-2); color: #fff; }
+  button.ghost { background: transparent; color: var(--accent-2); border: 1px solid var(--accent-2); }
+  button.danger { background: transparent; color: var(--warn); border: 1px solid var(--warn); }
+  button.small { padding: 4px 8px; font-size: .8rem; }
+  button.accent { background: var(--accent); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .res-row { display: flex; justify-content: space-between; padding: 6px 0;
+             border-bottom: 1px dashed var(--line); font-size: .92rem; }
+  .res-row span:last-child { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .res-total { font-size: 1.05rem; font-weight: 700; border-bottom: 0; color: var(--ink); }
+  .big { background: var(--accent-2); color: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; }
+  .big .lbl { font-size: .8rem; opacity: .85; }
+  .big .val { font-size: 1.4rem; font-weight: 700; }
+  .big.alt { background: var(--accent); }
+  .big + .big { margin-top: 8px; }
+  .warn { color: var(--warn); font-size: .82rem; margin-top: 8px; min-height: 1em; }
+  .banner { background: #fff4e5; border: 1px solid var(--accent); border-radius: 8px; padding: 10px 12px;
+            font-size: .88rem; margin-bottom: 12px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+  .small-table { font-size: .82rem; }
+  .tot-row td { font-weight: 600; border-bottom: 0; }
+  .file-btn { background: transparent; color: var(--accent-2); border: 1px solid var(--accent-2);
+              padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+  .file-btn input { display: none; }
+  .informe h3 { font-size: .95rem; margin: 16px 0 6px; color: var(--ink); }
+  .informe ul { margin: 6px 0 0 18px; padding: 0; font-size: .9rem; }
+  .informe li { margin-bottom: 4px; }
+  .sub { font-size: .85rem; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+  .archivo-bar { max-width: 900px; margin: 10px auto 0; padding: 0 20px; display: flex; gap: 10px;
+                 align-items: center; flex-wrap: wrap; font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Costos, análisis, cotización e informe · Fruta deshidratada</h1>
+  <p>Diseños y Soluciones 3D · Calcula, guarda registros con código, consulta cómo se calcularon y edítalos con historial de cambios</p>
+</header>
+
+<nav class="tabs">
+  <button id="tabCalc" class="active">Cálculo y base</button>
+  <button id="tabReg" class="ghost">Registros y cambios</button>
+  <button id="tabCompras" class="ghost">Compras de fruta</button>
+  <button id="tabPed" class="ghost">Pedidos de producción</button>
+  <button id="tabEst" class="ghost">Análisis y estrategia</button></nav>
+
+<div class="archivo-bar">
+  <span id="estadoArchivo">Revisando archivo de datos…</span>
+  <button id="btnElegirArchivo" class="ghost small">Elegir archivo de datos</button>
+  <button id="btnConectar" class="small" hidden>Conectar archivo</button>
+</div>
+<main>
+<div id="panelCalc">
+
+  <!-- 1. Producto -->
+  <section class="card">
+    <h2>1. Producto y lote</h2>
+    <div class="grid">
+      <label>Fruta (escribe el nombre o elige una de la lista; si no existe, escríbela y se crea)
+        <input id="fruta" type="text" list="listaFrutas" placeholder="Ej: Mango, Manzana verde..." autocomplete="off">
+        <datalist id="listaFrutas"></datalist>
+      </label>
+      <label>Identificador del lote (escribe uno distinto para cada lote de la misma fruta)
+        <input id="lote" type="text" placeholder="Ej: LT-2026-11-01">
+      </label>
+    </div>
+  </section>
+
+  <!-- 2. Fruta -->
+  <section class="card">
+    <h2>2. Fruta</h2>
+    <div class="grid">
+      <label>Valor total comprado (COP) — si lo ingresas, se usa en lugar del precio por lb
+        <input id="valorComprado" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Precio de compra por lb (COP) — solo si no ingresas el valor total
+        <input id="precioLb" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Peso comprado (g) — puedes sumar, ej: 500+300+250
+        <input id="lbCompradas" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off">
+      </label>
+      <label>Peso antes de deshidratar (g, ya pelada y cortada) — opcional
+        <input id="kgAntes" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off">
+      </label>
+      <label>Peso después de deshidratar (g) — obligatorio
+        <input id="kgDespues" class="formula" type="text" inputmode="decimal" value="0" placeholder="Ej: 850" autocomplete="off">
+      </label>
+    </div>
+    <p class="hint">La merma de pelado y corte se calcula sola: lo comprado menos lo preparado. Si no ingresas el peso preparado, el rendimiento se calcula sobre el peso comprado.</p>
+  </section>
+
+  <!-- 3. Energía y equipos -->
+  <section class="card">
+    <h2>3. Energía y equipos</h2>
+    <div class="grid" style="margin-bottom:12px">
+      <label>Precio del kWh (COP)
+        <input id="precioKwh" type="number" min="0" step="any" value="0">
+      </label>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Equipo</th><th class="num">Consumo (kWh por hora)</th><th class="num">Horas de uso</th>
+          <th class="num">Valor (COP)</th><th class="num">Vida útil (h)</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tblEquipos"></tbody>
+    </table>
+    <div class="actions">
+      <button class="ghost small" id="addEquipo">+ Agregar otro equipo</button>
+    </div>
+    <p class="hint">Energía = consumo × horas de uso. Depreciación del lote = valor ÷ vida útil × horas usadas. Las horas y los valores aceptan fórmulas, por ejemplo <b>2+1.5</b>.</p>
+  </section>
+
+  <!-- 4. Mano de obra -->
+  <section class="card">
+    <h2>4. Mano de obra</h2>
+    <div class="grid">
+      <label>Minutos totales del proceso (por lote) — puedes sumar, ej: 60+45+30
+        <input id="minProceso" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off">
+      </label>
+      <label>Valor del minuto de trabajo (COP)
+        <input id="valorMin" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Número de personas que trabajan en el proceso
+        <input id="personas" type="number" min="1" step="1" value="1">
+      </label>
+    </div>
+    <p class="hint">Costo de mano de obra = minutos totales × valor del minuto × número de personas.</p>
+  </section>
+
+  <!-- 5. Costo por gramo de fruta -->
+  <section class="card">
+    <h2>5. Costo por gramo de fruta (con equipos y mano de obra)</h2>
+    <div class="res-row"><span>Costo de la fruta comprada</span><span id="gFruta">$ 0</span></div>
+    <div class="res-row"><span>Costo de energía y depreciación de equipos</span><span id="gEquipos">$ 0</span></div>
+    <div class="res-row"><span>Costo de mano de obra</span><span id="gMO">$ 0</span></div>
+    <div class="res-row res-total"><span>Subtotal fruta + equipos + mano de obra</span><span id="gSubtotal">$ 0</span></div>
+    <div class="res-row"><span>Gramos de fruta comprada</span><span id="gComp">0</span></div>
+    <div class="res-row"><span>Gramos de fruta seca</span><span id="gSeco">0</span></div>
+    <div class="res-row"><span>Rendimiento (seco / preparado o comprado)</span><span id="rRend">0 %</span></div>
+    <div class="res-row res-total"><span>Costo por gramo comprado</span><span id="gFrutaComp">$ 0</span></div>
+    <div class="res-row res-total"><span>Costo por gramo seco</span><span id="gFrutaSeco">$ 0</span></div>
+    <div class="grid" style="margin-top:14px">
+      <label>Margen de utilidad deseado (%) sobre el precio de venta
+        <input id="utilidad" type="number" min="0" max="99" step="any" value="30">
+      </label>
+    </div>
+    <div class="big alt">
+      <div class="lbl">Precio de venta por gramo seco (con margen)</div>
+      <div class="val" id="pGrSeco">$ 0</div>
+    </div>
+    <p class="hint">Suma el costo de la fruta, la energía y depreciación de los equipos y la mano de obra, y lo divide entre los gramos de fruta. No incluye empaque ni transporte (sección 6).</p>
+  </section>
+
+  <!-- 6. Empaque, presentación y transporte -->
+  <section class="card">
+    <h2>6. Empaque, presentación y transporte</h2>
+    <div class="grid">
+      <label>Presentación por paquete (g)
+        <input id="presGr" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off">
+      </label>
+      <label>Transporte del lote (COP)
+        <input id="transporte" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Costo de bolsa por paquete (COP)
+        <input id="costoBolsa" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Costo de etiqueta por paquete (COP)
+        <input id="costoEtiqueta" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Costo de sellado por paquete (COP)
+        <input id="costoSellado" type="number" min="0" step="any" value="0">
+      </label>
+    </div>
+    <div class="res-row" style="margin-top:12px"><span>Paquetes producidos</span><span id="rPaq">0</span></div>
+    <div class="res-row"><span>Costo de empaque del lote</span><span id="cEmp">$ 0</span></div>
+    <div class="res-row"><span>Costo de transporte del lote</span><span id="cTrans">$ 0</span></div>
+  </section>
+
+  <!-- 7. Análisis -->
+  <section class="card">
+    <h2>7. Análisis del costo y precio</h2>
+    <p class="hint" style="margin-top:0">Reúne el costo de fruta, equipos, mano de obra, empaque y transporte.</p>
+    <div class="res-row"><span>Fruta</span><span id="cFruta">$ 0</span></div>
+    <div class="res-row"><span>Energía</span><span id="cEnergia">$ 0</span></div>
+    <div class="res-row"><span>Depreciación de equipos</span><span id="cDep">$ 0</span></div>
+    <div class="res-row"><span>Mano de obra</span><span id="cMO">$ 0</span></div>
+    <div class="res-row"><span>Empaque</span><span id="cEmp2">$ 0</span></div>
+    <div class="res-row"><span>Transporte</span><span id="cTrans2">$ 0</span></div>
+    <div class="res-row res-total"><span>Costo total del lote</span><span id="cTotal">$ 0</span></div>
+    <div class="res-row"><span>Costo por kg seco</span><span id="cKg">$ 0</span></div>
+    <div class="res-row"><span>Costo por gramo seco</span><span id="cGr">$ 0</span></div>
+    <div class="res-row"><span>Costo por paquete</span><span id="cPaq">$ 0</span></div>
+    <div class="big">
+      <div class="lbl">Precio de venta por gramo</div>
+      <div class="val" id="pGr">$ 0</div>
+    </div>
+    <div class="big alt">
+      <div class="lbl">Precio de venta por kg</div>
+      <div class="val" id="pKg">$ 0</div>
+    </div>
+    <div class="big">
+      <div class="lbl">Precio de venta por paquete</div>
+      <div class="val" id="pPaq">$ 0</div>
+    </div>
+    <div class="res-row" style="margin-top:10px"><span>Utilidad estimada del lote</span><span id="uLote">$ 0</span></div>
+    <div class="warn" id="aviso"></div>
+  </section>
+
+  <!-- 8. Base de costos por fruta -->
+  <section class="card">
+    <h2>8. Base de costos por fruta</h2>
+    <div class="banner" id="bannerEdit" hidden>
+      <span id="bannerTexto"></span>
+      <button class="ghost small" id="cancelarEdicion">Salir de edición</button>
+    </div>
+    <p class="hint" style="margin-top:0">Guarda el resultado del cálculo. Cada registro recibe un código (por ejemplo FRU-A1B2C3). Si guardas de nuevo la misma fruta y lote, se actualiza el registro y se anotan los cambios con fecha y hora. Para revisar o editar un registro, usa la pestaña "Registros y cambios".</p>
+    <div class="actions">
+      <button id="guardarFruta">Guardar fruta calculada</button>
+      <button class="ghost" id="exportarBase">Descargar base en Excel (.xlsx)</button>
+      <label class="file-btn">Cargar base desde Excel
+        <input type="file" id="cargarBase" accept=".xlsx,.xls">
+      </label>
+    </div>
+    <table class="small-table" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th>Código</th><th>Fruta</th><th>Lote</th><th>Creado</th><th>Última modif.</th>
+          <th class="num">Rend. %</th><th class="num">Precio/kg</th><th class="num">Precio/g seco</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tblBase"></tbody>
+    </table>
+    <div class="warn" id="avisoBase"></div>
+  </section>
+
+  <!-- 9. Mezclas y empaques por gramaje -->
+  <section class="card">
+    <h2>9. Mezclas y empaques por gramaje</h2>
+    <p class="hint" style="margin-top:0">Arma la mezcla con los gramos de cada fruta de la base; al final ves el porcentaje que representa cada una. El empaque cambia según el gramaje que pida el cliente.</p>
+    <div class="grid">
+      <label>Nombre de la mezcla
+        <input id="mzNombre" type="text" placeholder="Ej: Mix tropical">
+      </label>
+      <label>Margen de utilidad de la mezcla (%) sobre el precio
+        <input id="mzMargen" type="number" min="0" max="99" step="any" value="30">
+      </label>
+    </div>
+    <table style="margin-top:10px">
+      <thead><tr><th>Fruta y lote (de la base)</th><th class="num">Gramos en la mezcla</th><th></th></tr></thead>
+      <tbody id="tblIng"></tbody>
+    </table>
+    <datalist id="listaIngBase"></datalist>
+    <div class="actions"><button class="ghost small" id="mzAddIng">+ Agregar fruta a la mezcla</button></div>
+    <div class="res-row" style="margin-top:10px"><span>Total de la mezcla</span><span id="mzSuma">0 g</span></div>
+    <div class="hint" id="mzDesglose"></div>
+    <div class="res-row"><span>Costo por gramo de la mezcla</span><span id="mzCostoGr">$ 0</span></div>
+    <div class="res-row res-total"><span>Precio de venta por gramo de la mezcla</span><span id="mzPrecioGr">$ 0</span></div>
+    <div class="warn" id="mzAviso"></div>
+    <div class="actions"><button id="mzGuardar">Guardar mezcla</button></div>
+    <p class="hint">Si guardas una mezcla con el mismo nombre, reemplaza la anterior.</p>
+    <table class="small-table">
+      <thead><tr><th>Mezcla</th><th>Ingredientes</th><th class="num">Costo/g</th><th class="num">Margen %</th><th></th></tr></thead>
+      <tbody id="tblMezclas"></tbody>
+    </table>
+
+    <div class="sub">Empaques por gramaje</div>
+    <table class="small-table">
+      <thead><tr><th>Gramaje (g)</th><th class="num">Bolsa (COP)</th><th class="num">Etiqueta (COP)</th><th class="num">Sellado (COP)</th><th></th></tr></thead>
+      <tbody id="tblEmp"></tbody>
+    </table>
+    <div class="actions"><button class="ghost small" id="empAdd">+ Agregar gramaje</button></div>
+
+    <div class="sub">Cotizar una mezcla</div>
+    <div class="grid">
+      <label>Mezcla
+        <select id="selMezcla"></select>
+      </label>
+      <label>Gramaje del paquete (g) — escribe cualquier gramaje
+        <input id="selGramaje" type="text" list="listaGramajes" inputmode="decimal" autocomplete="off" placeholder="Ej: 150">
+        <datalist id="listaGramajes"></datalist>
+      </label>
+      <label>Bolsa de este gramaje (COP)
+        <input id="gBolsa" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Etiqueta de este gramaje (COP)
+        <input id="gEtiq" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Sellado de este gramaje (COP)
+        <input id="gSell" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Número de paquetes
+        <input id="mzPaq" type="number" min="1" step="1" value="1">
+      </label>
+    </div>
+    <p class="hint" id="mzInfo"></p>
+    <div class="actions"><button class="accent" id="mzAgregar">+ Agregar mezcla a la cotización</button></div>
+  </section>
+
+  <!-- 10. Cotización -->
+  <section class="card">
+    <h2>10. Cotización para el cliente</h2>
+    <p class="hint" style="margin-top:0">La cotización usa el precio por kg guardado en la base para cada fruta y lote, o el precio de una mezcla.</p>
+    <div class="grid">
+      <label>Cliente
+        <input id="cliente" type="text" placeholder="Nombre o empresa">
+      </label>
+      <label>Número de cotización
+        <input id="numCot" type="text">
+      </label>
+      <label>Validez de la oferta (días)
+        <input id="validez" type="number" min="1" step="1" value="15">
+      </label>
+      <label>IVA (%)
+        <input id="iva" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Fruta y lote a cotizar (escribe o elige de la base)
+        <input id="frutaCot" type="text" list="listaFrutasBase" placeholder="Escribe o elige una fruta guardada" autocomplete="off">
+        <datalist id="listaFrutasBase"></datalist>
+      </label>
+      <label>Precio por kg guardado (COP)
+        <input id="precioCot" type="text" readonly>
+      </label>
+      <label>Cantidad que requiere el cliente (kg de fruta seca)
+        <input id="cantKg" type="number" min="0" step="any" value="0">
+      </label>
+      <label>Paquetes aproximados
+        <input id="paqCot" type="text" readonly>
+      </label>
+    </div>
+    <div class="actions">
+      <button class="accent" id="agregarItem">+ Agregar ítem a la cotización</button>
+      <button class="danger small" id="limpiarCot">Vaciar cotización</button>
+    </div>
+    <table style="margin-top:12px">
+      <thead>
+        <tr><th>Fruta</th><th class="num">Kg</th><th class="num">Precio/kg</th><th class="num">Paquetes</th><th class="num">Subtotal</th><th></th></tr>
+      </thead>
+      <tbody id="tblCot"></tbody>
+      <tfoot>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">Subtotal</td><td class="num" id="cotSub">$ 0</td><td></td></tr>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">IVA</td><td class="num" id="cotIva">$ 0</td><td></td></tr>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">Total</td><td class="num" id="cotTotal">$ 0</td><td></td></tr>
+      </tfoot>
+    </table>
+    <div class="actions">
+      <button id="exportarCot">Descargar cotización para el cliente (.xlsx)</button>
+    </div>
+    <p class="hint">El archivo de la cotización solo contiene la oferta para el cliente. Los costos internos quedan en la base y en el informe.</p>
+  </section>
+
+  <!-- 11. Informe -->
+  <section class="card">
+    <h2>11. Informe de costos, precios y descuentos por cantidad</h2>
+    <p class="hint" style="margin-top:0">El informe usa todas las frutas y lotes guardados en la base. Para cada uno calcula el costo por kg según la cantidad: a mayor cantidad, los costos fijos del lote se reparten entre más kilos.</p>
+    <div class="grid">
+      <label>Tramos de cantidad (kg, separados por coma)
+        <input id="tramos" type="text" value="5,10,25,50">
+      </label>
+      <label>Porcentaje del ahorro que se comparte con el cliente (%)
+        <input id="share" type="number" min="0" max="100" step="any" value="50">
+      </label>
+      <label>Descuento máximo permitido (%)
+        <input id="descMax" type="number" min="0" max="100" step="any" value="15">
+      </label>
+      <label>Margen mínimo que debe quedar después del descuento (%)
+        <input id="margenMin" type="number" min="0" step="any" value="10">
+      </label>
+    </div>
+    <div class="actions">
+      <button id="generarInforme">Generar informe</button>
+      <button class="ghost" id="descargarInforme">Descargar informe en Excel (.xlsx)</button>
+    </div>
+    <div class="informe" id="informe"></div>
+  </section>
+</div>
+
+<!-- Pestaña: registros, cómo se calculó, edición e historial -->
+<div id="panelReg" hidden>
+  <section class="card">
+    <h2>Registros guardados: código, cálculo, edición e historial</h2>
+    <p class="hint" style="margin-top:0">Escribe el código del registro (por ejemplo FRU-A1B2C3) o la fruta y lote. Verás cómo se calculó, los datos que se usaron y el historial de cambios. Para editarlo, pulsa "Editar en la calculadora": el registro se carga en la pestaña de cálculo y, al guardar, se anotan los cambios con fecha y hora.</p>
+    <div class="grid">
+      <label>Código o fruta – lote
+        <input id="regBuscar" type="text" list="listaRegistros" placeholder="Ej: FRU-A1B2C3" autocomplete="off">
+        <datalist id="listaRegistros"></datalist>
+      </label>
+      <div style="display:flex;align-items:flex-end">
+        <button id="regVer">Ver registro</button>
+      </div>
+    </div>
+    <div id="regDetalle" class="informe" style="margin-top:12px"></div>
+  </section>
+</div>
+<!-- Pestaña: registro de compras de fruta y análisis por periodo -->
+<div id="panelCompras" hidden>
+  <section class="card">
+    <h2>Registro de compras de fruta</h2>
+    <p class="hint" style="margin-top:0">Registra cuánto y a qué precio compraste la fruta en cada fecha. Con estos datos se analiza cómo cambia el precio en el tiempo.</p>
+    <div class="grid">
+      <label>Fecha de compra<input id="cpFecha" type="date"></label>
+      <label>Fruta<input id="cpFruta" type="text" list="listaFrutas" autocomplete="off" placeholder="Ej: Mango"></label>
+      <label>Cantidad comprada (kg) — puedes sumar<input id="cpKg" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off"></label>
+      <label>Valor total pagado (COP) — puedes sumar<input id="cpValor" class="formula" type="text" inputmode="decimal" value="0" autocomplete="off"></label>
+      <label>Proveedor o plaza (opcional)<input id="cpProv" type="text" placeholder="Ej: Plaza mayorista"></label>
+      <label>Referencia o lote (opcional)<input id="cpRef" type="text"></label>
+    </div>
+    <p class="hint" id="cpPrecio">Precio por kg: —</p>
+    <div class="actions"><button id="cpGuardar">Guardar compra</button></div>
+    <table class="small-table" style="margin-top:10px">
+      <thead><tr><th>Fecha</th><th>Fruta</th><th>Proveedor</th><th class="num">Kg</th><th class="num">Valor</th><th class="num">Precio/kg</th><th></th></tr></thead>
+      <tbody id="tblCompras"></tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Análisis del precio de compra</h2>
+    <div class="grid">
+      <label>Fruta<select id="anFruta"></select></label>
+      <label>Agrupar por
+        <select id="anPeriodo">
+          <option value="mes">Mensual</option><option value="bimestre">Bimestral</option>
+          <option value="trimestre">Trimestral</option><option value="semestre">Semestral</option><option value="anio">Anual</option>
+        </select>
+      </label>
+    </div>
+    <div id="anCompras" class="informe" style="margin-top:12px"></div>
+  </section>
+</div>
+
+<!-- Pestaña: pedidos de producción y seguimiento por cliente -->
+<div id="panelPed" hidden>
+  <section class="card">
+    <h2>Nuevo pedido de producción</h2>
+    <p class="hint" style="margin-top:0">Al crear el pedido se asigna un número de lote y se guarda una copia de la cotización que está en la sección 10 en ese momento. Así el precio acordado queda registrado aunque después cambies los costos.</p>
+    <div class="grid">
+      <label>Cliente<input id="pdCliente" type="text" list="listaClientes" autocomplete="off" placeholder="Nombre o empresa"></label>
+      <datalist id="listaClientes"></datalist>
+      <label>Fecha de fabricación<input id="pdFecha" type="date"></label>
+      <label>Fecha de entrega (opcional)<input id="pdEntrega" type="date"></label>
+      <label>Estado inicial
+        <select id="pdEstado"><option>Pendiente</option><option>En proceso</option><option>Entregado</option><option>Cancelado</option></select>
+      </label>
+      <label>Observaciones<input id="pdObs" type="text"></label>
+    </div>
+    <div class="actions"><button id="pdCrear">Crear pedido con la cotización actual</button></div>
+    <p class="hint" id="pdAviso"></p>
+  </section>
+  <section class="card">
+    <h2>Pedidos y seguimiento</h2>
+    <div class="grid">
+      <label>Filtrar por cliente<select id="pdFiltroCliente"></select></label>
+      <label>Total de pedidos del cliente seleccionado<input id="pdResumen" type="text" readonly></label>
+    </div>
+    <table class="small-table" style="margin-top:10px">
+      <thead><tr><th>Lote</th><th>Cliente</th><th>Fabricación</th><th>Entrega</th><th>Estado</th><th class="num">Total</th><th></th></tr></thead>
+      <tbody id="tblPedidos"></tbody>
+    </table>
+    <div class="actions"><button class="ghost" id="pdExportar">Descargar pedidos en Excel (.xlsx)</button></div>
+    <div id="pdDetalle" class="informe" style="margin-top:12px"></div>
+  </section>
+</div>
+
+<!-- Pestaña: análisis de costos y estrategia de precios -->
+<div id="panelEst" hidden>
+  <section class="card">
+    <h2>Análisis de costos y precios por fruta</h2>
+    <p class="hint" style="margin-top:0">Resume los lotes guardados y el precio de compra registrado. Las recomendaciones son orientativas: revísalas frente a tu mercado.</p>
+    <div class="grid">
+      <label>Margen objetivo para el precio sugerido (%)<input id="estMargen" type="number" min="0" max="99" step="any" value="30"></label>
+    </div>
+    <div id="estResumen" class="informe" style="margin-top:12px"></div>
+  </section>
+  <section class="card">
+    <h2>Escenario de precio</h2>
+    <div class="grid">
+      <label>Fruta<select id="scFruta"></select></label>
+      <label>Cantidad del pedido (kg)<input id="scKg" type="number" min="0" step="any" value="10"></label>
+      <label>Cambio en el costo por kg (%) — negativo si baja<input id="scCambio" type="number" step="any" value="0"></label>
+      <label>Margen objetivo (%) sobre el precio<input id="scMargen" type="number" min="0" max="99" step="any" value="30"></label>
+    </div>
+    <div id="scResultado" class="informe" style="margin-top:12px"></div>
+  </section>
+</div>
+</main>
+
+<script>
+const FRUTAS = ["Piña","Naranja","Limón","Fresa","Mango","Papaya","Kiwi","Ciruela",
+                "Manzana","Uva","Coco","Banano","Ochuva","Pitaya"];
+const LB_KG = 0.45359237;
+const KEY_BASE = "base-deshidratados-v4";
+const KEY_BASE_ANT = "base-deshidratados-v3";
+const $ = id => document.getElementById(id);
+
+// Evalúa números o fórmulas simples (+ - * / paréntesis). Acepta coma o punto decimal.
+function evalExpr(texto) {
+  const s = String(texto ?? "").replace(/,/g, ".").replace(/\s+/g, "");
+  if (s === "") return 0;
+  if (!/^[0-9+\-*/().]+$/.test(s)) return NaN;
+  try {
+    const v = Function(`"use strict"; return (${s});`)();
+    return Number.isFinite(v) ? v : NaN;
+  } catch { return NaN; }
+}
+const num = id => { const v = evalExpr($(id).value); return isNaN(v) ? 0 : v; };
+const fmt = n => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n || 0);
+const fmt2 = n => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
+const fmtN = (n, d = 2) => new Intl.NumberFormat("es-CO", { maximumFractionDigits: d }).format(n || 0);
+const norm = s => (s || "").trim().toLowerCase();
+// Precio con margen sobre el precio de venta: precio = costo / (1 - margen)
+const conMargen = (costo, m) => m >= 100 ? 0 : costo / (1 - m / 100);
+const ahoraStr = () => { const d = new Date(); return d.toLocaleDateString("es-CO") + " " + d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }); };
+const generarCodigo = () => "FRU-" + Date.now().toString(36).toUpperCase().slice(-4) + Math.floor(Math.random() * 1296).toString(36).toUpperCase().padStart(2, "0");
+
+let ultimo = null;
+let itemsCot = [];
+let base = [];
+let editandoCodigo = null;
+
+FRUTAS.forEach(f => {
+  const o = document.createElement("option"); o.value = f; $("listaFrutas").appendChild(o);
+});
+
+function generarNumCot() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, "0");
+  return `COT-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+$("numCot").value = generarNumCot();
+
+// ---- Pestañas ----
+const PANELES = { calc: "panelCalc", reg: "panelReg", compras: "panelCompras", ped: "panelPed", est: "panelEst" };
+const BOTONES = { calc: "tabCalc", reg: "tabReg", compras: "tabCompras", ped: "tabPed", est: "tabEst" };
+function showTab(t) {
+  Object.keys(PANELES).forEach(k => {
+    $(PANELES[k]).hidden = k !== t;
+    $(BOTONES[k]).className = k === t ? "" : "ghost";
+  });
+  if (t === "reg") actualizarListaRegistros();
+  if (t === "compras") actualizarSelFrutasAnalisis();
+  if (t === "ped") actualizarPedidos();
+  if (t === "est") actualizarEstrategia();
+}
+Object.keys(BOTONES).forEach(k => $(BOTONES[k]).addEventListener("click", () => showTab(k)));
+
+// ---- Equipos dinámicos ----
+function addEquipoRow(e = { nombre: "", kw: 0, horas: 0, valor: 0, vida: 0 }) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><input type="text" class="eq-nombre" value="${e.nombre ?? ""}" placeholder="Nombre"></td>
+    <td><input type="text" inputmode="decimal" class="eq-kw num" value="${e.kw ?? 0}"></td>
+    <td><input type="text" inputmode="decimal" class="eq-horas num" value="${e.horas ?? 0}" placeholder="Ej: 2+1.5"></td>
+    <td><input type="text" inputmode="decimal" class="eq-valor num" value="${e.valor ?? 0}"></td>
+    <td><input type="text" inputmode="decimal" class="eq-vida num" value="${e.vida ?? 0}"></td>
+    <td><button class="danger small eq-del">✕</button></td>`;
+  $("tblEquipos").appendChild(tr);
+  tr.querySelectorAll("input").forEach(i => i.addEventListener("input", calcular));
+  tr.querySelector(".eq-del").addEventListener("click", () => { tr.remove(); calcular(); });
+}
+$("addEquipo").addEventListener("click", () => { addEquipoRow(); calcular(); });
+
+function leerEquipos() {
+  return [...document.querySelectorAll("#tblEquipos tr")].map(tr => ({
+    kw: evalExpr(tr.querySelector(".eq-kw").value) || 0,
+    horas: evalExpr(tr.querySelector(".eq-horas").value) || 0,
+    valor: evalExpr(tr.querySelector(".eq-valor").value) || 0,
+    vida: evalExpr(tr.querySelector(".eq-vida").value) || 0,
+  }));
+}
+
+// ---- Entradas del formulario (para guardar, editar y comparar cambios) ----
+const ENTRADAS_IDS = ["fruta","lote","valorComprado","precioLb","lbCompradas","kgAntes","kgDespues",
+  "precioKwh","minProceso","valorMin","personas","presGr","transporte","costoBolsa","costoEtiqueta","costoSellado","utilidad"];
+const ETIQ_ENTRADA = {
+  fruta: "Fruta", lote: "Lote", valorComprado: "Valor total comprado (COP)", precioLb: "Precio por lb (COP)",
+  lbCompradas: "Peso comprado (g)", kgAntes: "Peso antes de deshidratar (g)", kgDespues: "Peso después de deshidratar (g)",
+  precioKwh: "Precio del kWh (COP)", minProceso: "Minutos del proceso", valorMin: "Valor del minuto (COP)",
+  personas: "Número de personas", presGr: "Presentación (g)", transporte: "Transporte (COP)",
+  costoBolsa: "Bolsa por paquete (COP)", costoEtiqueta: "Etiqueta por paquete (COP)", costoSellado: "Sellado por paquete (COP)",
+  utilidad: "Margen de utilidad (%)", equipos: "Equipos",
+};
+
+function getEntradas() {
+  const o = {};
+  ENTRADAS_IDS.forEach(id => o[id] = $(id).value);
+  o.equipos = [...$("tblEquipos").querySelectorAll("tr")].map(tr => ({
+    nombre: tr.querySelector(".eq-nombre").value,
+    kw: tr.querySelector(".eq-kw").value,
+    horas: tr.querySelector(".eq-horas").value,
+    valor: tr.querySelector(".eq-valor").value,
+    vida: tr.querySelector(".eq-vida").value,
+  }));
+  return o;
+}
+
+function setEntradas(o) {
+  ENTRADAS_IDS.forEach(id => { if (o[id] !== undefined) $(id).value = o[id]; });
+  $("tblEquipos").innerHTML = "";
+  (o.equipos || []).forEach(e => addEquipoRow(e));
+  if (!(o.equipos || []).length) addEquipoRow();
+  calcular();
+}
+
+function textoEntrada(k, v) {
+  if (k === "equipos") {
+    return (v || []).map(e => `${e.nombre || "Equipo"}: ${e.kw} kWh, ${e.horas} h, $${e.valor}, vida ${e.vida} h`).join(" | ");
+  }
+  return v === undefined || v === null ? "" : String(v);
+}
+
+function registrarCambios(prev, nuevo) {
+  const cuando = ahoraStr();
+  const cambios = [];
+  Object.keys({ ...prev, ...nuevo }).forEach(k => {
+    if (!(k in ETIQ_ENTRADA)) return;
+    if (JSON.stringify(prev[k] ?? "") !== JSON.stringify(nuevo[k] ?? "")) {
+      cambios.push({ cuando, campo: ETIQ_ENTRADA[k], anterior: textoEntrada(k, prev[k]), nuevo: textoEntrada(k, nuevo[k]) });
+    }
+  });
+  return cambios;
+}
+
+// ---- Cálculo del lote y análisis ----
+function calcular() {
+  const gComp = num("lbCompradas");
+  const kgComp = gComp / 1000;
+  const lbComp = kgComp / LB_KG;
+  const kgAntes = num("kgAntes") / 1000;
+  const gSeco = num("kgDespues");
+  const kgSeco = gSeco / 1000;
+  const merma = kgAntes > 0 ? Math.max(kgComp - kgAntes, 0) : 0;
+  const baseRend = kgAntes > 0 ? kgAntes : kgComp;
+  const rend = baseRend > 0 ? (kgSeco / baseRend) * 100 : 0;
+
+  const valorComprado = num("valorComprado");
+  const costoFruta = valorComprado > 0 ? valorComprado : lbComp * num("precioLb");
+
+  const equipos = leerEquipos();
+  const kwh = equipos.reduce((s, e) => s + e.kw * e.horas, 0);
+  const costoEnergia = kwh * num("precioKwh");
+  const costoDep = equipos.reduce((s, e) => s + (e.vida > 0 ? (e.valor / e.vida) * e.horas : 0), 0);
+
+  const costoMO = num("minProceso") * num("valorMin") * Math.max(num("personas"), 1);
+
+  const costoEquiposGr = costoEnergia + costoDep;
+  const subtotalGr = costoFruta + costoEquiposGr + costoMO;
+  const costoFrutaComp = gComp > 0 ? subtotalGr / gComp : 0;
+  const costoFrutaSeco = gSeco > 0 ? subtotalGr / gSeco : 0;
+
+  const presGr = num("presGr");
+  const paquetes = presGr > 0 ? Math.floor(gSeco / presGr) : 0;
+  const costoEmp = paquetes * (num("costoBolsa") + num("costoEtiqueta") + num("costoSellado"));
+  const costoTrans = num("transporte");
+
+  const total = costoFruta + costoEnergia + costoDep + costoMO + costoEmp + costoTrans;
+  const costoFijoLote = costoTrans;
+  const costoKg = kgSeco > 0 ? total / kgSeco : 0;
+  const costoGr = gSeco > 0 ? total / gSeco : 0;
+  const utilPct = num("utilidad");
+  const precioKg = conMargen(costoKg, utilPct);
+  const precioGr = conMargen(costoGr, utilPct);
+  const precioPaq = presGr > 0 ? precioGr * presGr : 0;
+  const costoPaq = paquetes > 0 ? total / paquetes : 0;
+  const utilidadLote = precioKg * kgSeco - total;
+
+  const nombreFruta = $("fruta").value.trim();
+  const valido = nombreFruta !== "" && gSeco > 0;
+  ultimo = valido ? {
+    fruta: nombreFruta, lote: $("lote").value.trim(),
+    kgComp, kgAntes, kgSeco, rend, presGr, paquetes,
+    costoTotal: total, costoFijo: costoFijoLote, costoKg, margen: utilPct, precioKg, precioPaq,
+    costoGrSeco: costoFrutaSeco, precioGrSeco: conMargen(costoFrutaSeco, utilPct),
+    entradas: getEntradas(),
+    desglose: {
+      "Fruta": costoFruta, "Energía": costoEnergia, "Depreciación de equipos": costoDep,
+      "Mano de obra": costoMO, "Empaque": costoEmp, "Transporte": costoTrans,
+      "Costo total del lote": total, "Costo por kg seco": costoKg, "Costo por gramo seco": costoGr,
+      "Subtotal fruta + equipos + MO": subtotalGr, "Costo por gramo seco (fruta, equipos y MO)": costoFrutaSeco,
+      "Precio por gramo seco": conMargen(costoFrutaSeco, utilPct), "Precio por gramo": precioGr,
+      "Precio por kg": precioKg, "Precio por paquete": precioPaq, "Paquetes": paquetes,
+      "Rendimiento (%)": rend, "Margen (%)": utilPct,
+    },
+  } : null;
+
+  $("gFruta").textContent = fmt(costoFruta);
+  $("gEquipos").textContent = fmt(costoEquiposGr);
+  $("gMO").textContent = fmt(costoMO);
+  $("gSubtotal").textContent = fmt(subtotalGr);
+  $("gComp").textContent = fmtN(gComp, 0) + " g";
+  $("gSeco").textContent = fmtN(gSeco, 0) + " g";
+  $("rRend").textContent = fmtN(rend, 1) + " %";
+  $("gFrutaComp").textContent = fmt2(costoFrutaComp);
+  $("gFrutaSeco").textContent = fmt2(costoFrutaSeco);
+  $("pGrSeco").textContent = fmt2(conMargen(costoFrutaSeco, utilPct));
+
+  $("rPaq").textContent = fmtN(paquetes, 0);
+  $("cEmp").textContent = fmt(costoEmp);
+  $("cTrans").textContent = fmt(costoTrans);
+
+  $("cFruta").textContent = fmt(costoFruta);
+  $("cEnergia").textContent = fmt(costoEnergia);
+  $("cDep").textContent = fmt(costoDep);
+  $("cMO").textContent = fmt(costoMO);
+  $("cEmp2").textContent = fmt(costoEmp);
+  $("cTrans2").textContent = fmt(costoTrans);
+  $("cTotal").textContent = fmt(total);
+  $("cKg").textContent = fmt(costoKg);
+  $("cGr").textContent = fmt2(costoGr);
+  $("cPaq").textContent = fmt(costoPaq);
+  $("pGr").textContent = fmt2(precioGr);
+  $("pKg").textContent = fmt(precioKg);
+  $("pPaq").textContent = fmt(precioPaq);
+  $("uLote").textContent = fmt(utilidadLote);
+
+  const avisos = [];
+  if (kgAntes > kgComp && kgComp > 0) avisos.push("El peso preparado es mayor que el comprado: revisa los datos.");
+  if (gSeco > num("kgAntes") && num("kgAntes") > 0) avisos.push("El peso seco no puede ser mayor que el preparado.");
+  if (!nombreFruta) avisos.push("Escribe el nombre de la fruta.");
+  if (gSeco === 0) avisos.push("Ingresa el peso después de deshidratar en gramos para calcular el costo por gramo.");
+  if (kgAntes === 0) avisos.push("Sin peso preparado, la merma no se calcula y el rendimiento se calcula sobre el peso comprado.");
+  if (presGr === 0) avisos.push("Indica la presentación por paquete (sección 6) para calcular paquetes y precio por paquete.");
+  $("aviso").textContent = avisos.join(" ");
+}
+
+// ---- Base por fruta y lote ----
+function guardarBase() { localStorage.setItem(KEY_BASE, JSON.stringify(base)); sincronizarArchivo(); }
+function cargarBaseLocal() {
+  try { base = JSON.parse(localStorage.getItem(KEY_BASE) || "null") || []; }
+  catch { base = []; }
+  if (!base.length) {
+    try { base = JSON.parse(localStorage.getItem(KEY_BASE_ANT) || "[]"); } catch { base = []; }
+  }
+  base.forEach(r => { if (!r.codigo) r.codigo = generarCodigo(); if (!r.cambios) r.cambios = []; });
+}
+function ordenarBase() {
+  base.sort((a, b) => a.fruta.localeCompare(b.fruta, "es") || (a.lote || "").localeCompare(b.lote || "", "es"));
+}
+const claveRegistro = r => norm(r.fruta) + "|" + norm(r.lote);
+const etiqueta = r => r.lote ? `${r.fruta} – ${r.lote}` : r.fruta;
+
+function pintarBase() {
+  const tb = $("tblBase");
+  tb.innerHTML = base.length ? "" : `<tr><td colspan="9" style="color:var(--muted)">Aún no hay frutas guardadas.</td></tr>`;
+  base.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.codigo}</td><td>${r.fruta}</td><td>${r.lote || "-"}</td><td>${r.fecha || ""}</td>
+      <td>${r.ultimaModificacion || "-"}</td>
+      <td class="num">${fmtN(r.rend, 1)}</td><td class="num">${fmt(r.precioKg)}</td>
+      <td class="num">${fmt2(r.precioGrSeco || 0)}</td>
+      <td><button class="danger small">✕</button></td>`;
+    tr.querySelector("button").addEventListener("click", () => {
+      if (!confirm(`¿Eliminar el registro ${r.codigo} (${etiqueta(r)})?`)) return;
+      base = base.filter(x => x !== r); guardarBase(); pintarBase(); llenarSelectCot();
+    });
+    tb.appendChild(tr);
+  });
+  $("avisoBase").textContent = base.length ? "" : "Guarda al menos una fruta para poder cotizar y generar el informe.";
+}
+
+function llenarSelectCot() {
+  const dl = $("listaFrutasBase");
+  dl.innerHTML = "";
+  base.forEach(r => { const o = document.createElement("option"); o.value = etiqueta(r); dl.appendChild(o); });
+  actualizarListasMezclas();
+  actualizarListaRegistros();
+  mostrarPrecioCot();
+}
+
+function registroCot() { return base.find(r => norm(etiqueta(r)) === norm($("frutaCot").value)); }
+
+function mostrarPrecioCot() {
+  const r = registroCot();
+  $("precioCot").value = r ? fmt(r.precioKg) : "";
+  const kg = num("cantKg");
+  $("paqCot").value = r && r.presGr > 0 ? fmtN(Math.floor(kg * 1000 / r.presGr), 0) : "";
+}
+
+// Guardar: crea un registro con código o actualiza el existente y anota los cambios
+$("guardarFruta").addEventListener("click", () => {
+  if (!ultimo) { alert("Completa el cálculo (nombre de la fruta y peso después de deshidratar) antes de guardar."); return; }
+  const fechaHoy = new Date().toLocaleDateString("es-CO");
+  const idx = editandoCodigo
+    ? base.findIndex(r => r.codigo === editandoCodigo)
+    : base.findIndex(r => claveRegistro(r) === claveRegistro(ultimo));
+  let rec;
+  if (idx >= 0) {
+    const prev = base[idx];
+    const cambios = registrarCambios(prev.entradas || {}, ultimo.entradas);
+    rec = {
+      ...ultimo, codigo: prev.codigo, fecha: prev.fecha || fechaHoy,
+      cambios: [...(prev.cambios || []), ...cambios],
+      ultimaModificacion: cambios.length ? ahoraStr() : (prev.ultimaModificacion || ""),
+    };
+    base.splice(idx, 1);
+  } else {
+    rec = { ...ultimo, codigo: generarCodigo(), fecha: fechaHoy, cambios: [], ultimaModificacion: "" };
+  }
+  base = base.filter(x => claveRegistro(x) !== claveRegistro(rec));
+  base.push(rec); ordenarBase();
+  guardarBase(); pintarBase(); llenarSelectCot();
+  salirEdicion();
+  $("frutaCot").value = etiqueta(rec); mostrarPrecioCot();
+});
+
+// ---- Edición desde la pestaña de registros ----
+function cargarParaEditar(codigo) {
+  const r = base.find(x => x.codigo === codigo);
+  if (!r) return;
+  if (!r.entradas) {
+    alert("Este registro se guardó antes de existir el historial de entradas. Vuelve a calcularlo y guárdalo para poder editarlo.");
+    return;
+  }
+  editandoCodigo = codigo;
+  setEntradas(r.entradas);
+  $("bannerTexto").textContent = `Editando el registro ${codigo} (${etiqueta(r)}). Al guardar, se anotan los cambios con fecha y hora.`;
+  $("bannerEdit").hidden = false;
+  showTab("calc");
+  window.scrollTo(0, 0);
+}
+function salirEdicion() {
+  editandoCodigo = null;
+  $("bannerEdit").hidden = true;
+}
+$("cancelarEdicion").addEventListener("click", salirEdicion);
+
+function actualizarListaRegistros() {
+  const dl = $("listaRegistros");
+  if (!dl) return;
+  dl.innerHTML = "";
+  base.forEach(r => { const o = document.createElement("option"); o.value = r.codigo; o.label = etiqueta(r); dl.appendChild(o); });
+}
+
+function buscarRegistro(texto) {
+  const t = norm(texto);
+  return base.find(r => norm(r.codigo) === t) || base.find(r => norm(etiqueta(r)) === t);
+}
+
+function mostrarRegistro(r) {
+  const filasDesglose = Object.entries(r.desglose || {}).map(([k, v]) =>
+    `<tr><td>${k}</td><td class="num">${typeof v === "number" ? (/gramo|kg|Precio/.test(k) ? fmt2(v) : (/Rendimiento|Margen|Paquetes/.test(k) ? fmtN(v, 1) : fmt(v))) : v}</td></tr>`).join("");
+  const filasEntradas = Object.entries(r.entradas || {}).map(([k, v]) =>
+    `<tr><td>${ETIQ_ENTRADA[k] || k}</td><td>${textoEntrada(k, v) || "-"}</td></tr>`).join("");
+  const filasCambios = (r.cambios || []).slice().reverse().map(c =>
+    `<tr><td>${c.cuando}</td><td>${c.campo}</td><td>${c.anterior || "-"}</td><td>${c.nuevo || "-"}</td></tr>`).join("");
+
+  $("regDetalle").innerHTML = `
+    <h3>Registro ${r.codigo}: ${etiqueta(r)}</h3>
+    <p class="hint">Creado: ${r.fecha || "-"} · Última modificación: ${r.ultimaModificacion || "sin cambios"} · Cambios registrados: ${(r.cambios || []).length}</p>
+    <div class="actions">
+      <button id="regEditar">Editar en la calculadora</button>
+      <button class="danger small" id="regEliminar">Eliminar registro</button>
+    </div>
+    <h3>Cómo se calculó</h3>
+    ${r.desglose ? `<table class="small-table"><thead><tr><th>Concepto</th><th class="num">Valor</th></tr></thead><tbody>${filasDesglose}</tbody></table>`
+      : `<p class="hint">Este registro no tiene desglose guardado. Recalcúlalo y guárdalo.</p>`}
+    <h3>Datos que se usaron</h3>
+    ${r.entradas ? `<table class="small-table"><thead><tr><th>Dato</th><th>Valor</th></tr></thead><tbody>${filasEntradas}</tbody></table>`
+      : `<p class="hint">Sin datos de entrada guardados.</p>`}
+    <h3>Historial de cambios</h3>
+    ${(r.cambios || []).length ? `<table class="small-table"><thead><tr><th>Fecha y hora</th><th>Campo</th><th>Valor anterior</th><th>Valor nuevo</th></tr></thead><tbody>${filasCambios}</tbody></table>`
+      : `<p class="hint">Sin cambios registrados desde que se guardó.</p>`}`;
+
+  $("regEditar").addEventListener("click", () => cargarParaEditar(r.codigo));
+  $("regEliminar").addEventListener("click", () => {
+    if (!confirm(`¿Eliminar el registro ${r.codigo}? Esta acción no se puede deshacer.`)) return;
+    base = base.filter(x => x !== r); guardarBase(); pintarBase(); llenarSelectCot();
+    $("regDetalle").innerHTML = "";
+    if (editandoCodigo === r.codigo) salirEdicion();
+  });
+}
+
+$("regVer").addEventListener("click", () => {
+  const r = buscarRegistro($("regBuscar").value);
+  if (!r) { $("regDetalle").innerHTML = `<p class="warn">No encontré un registro con ese código o fruta y lote.</p>`; return; }
+  mostrarRegistro(r);
+});
+$("regBuscar").addEventListener("change", () => {
+  const r = buscarRegistro($("regBuscar").value);
+  if (r) mostrarRegistro(r);
+});
+
+// ---- Excel de la base: registros, historial de cambios y entradas con desglose ----
+const COLS = [
+  ["Fruta", "fruta"], ["Lote", "lote"], ["Fecha", "fecha"],
+  ["Kg comprados", "kgComp"], ["Kg preparados", "kgAntes"], ["Kg secos", "kgSeco"],
+  ["Rendimiento (%)", "rend"], ["Presentación (g)", "presGr"], ["Paquetes", "paquetes"],
+  ["Costo total lote (COP)", "costoTotal"], ["Costo fijo lote (COP)", "costoFijo"],
+  ["Costo por kg (COP)", "costoKg"], ["Margen (%)", "margen"],
+  ["Precio por kg (COP)", "precioKg"], ["Precio por paquete (COP)", "precioPaq"],
+  ["Costo por gramo seco (COP)", "costoGrSeco"], ["Precio por gramo seco (COP)", "precioGrSeco"],
+];
+const NUMERICAS = ["kgComp","kgAntes","kgSeco","rend","presGr","paquetes","costoTotal","costoFijo","costoKg","margen","precioKg","precioPaq","costoGrSeco","precioGrSeco"];
+const HOJA_HIST = "Historial de cambios";
+const HOJA_DESG = "Entradas y desglose";
+
+$("exportarBase").addEventListener("click", () => {
+  if (!base.length) { alert("La base está vacía."); return; }
+  const filas = base.map(r => {
+    const o = { "Código": r.codigo };
+    COLS.forEach(([titulo, clave]) => {
+      let v = r[clave] ?? "";
+      if (typeof v === "number") v = +v.toFixed(2);
+      o[titulo] = v;
+    });
+    o["Última modificación"] = r.ultimaModificacion || "";
+    o["Nº de cambios"] = (r.cambios || []).length;
+    return o;
+  });
+  const hist = [];
+  base.forEach(r => (r.cambios || []).forEach(c => hist.push({
+    "Código": r.codigo, "Fruta": r.fruta, "Lote": r.lote || "-",
+    "Fecha y hora": c.cuando, "Campo": c.campo, "Valor anterior": c.anterior, "Valor nuevo": c.nuevo,
+  })));
+  const desg = base.map(r => {
+    const o = { "Código": r.codigo, "Fruta": r.fruta, "Lote": r.lote || "-",
+      "Datos de entrada (JSON)": JSON.stringify(r.entradas || {}) };
+    Object.entries(r.desglose || {}).forEach(([k, v]) => { o[k] = typeof v === "number" ? +v.toFixed(2) : v; });
+    return o;
+  });
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(filas);
+  ws1["!cols"] = Object.keys(filas[0]).map(k => ({ wch: Math.max(12, k.length + 2) }));
+  XLSX.utils.book_append_sheet(wb, ws1, "Base por fruta");
+  const ws2 = XLSX.utils.json_to_sheet(hist.length ? hist : [{ "Código": "", "Campo": "Sin cambios registrados" }]);
+  XLSX.utils.book_append_sheet(wb, ws2, HOJA_HIST);
+  const ws3 = XLSX.utils.json_to_sheet(desg);
+  XLSX.utils.book_append_sheet(wb, ws3, HOJA_DESG);
+  XLSX.writeFile(wb, `base-costos-frutas-${new Date().toISOString().slice(0, 10)}.xlsx`);
+});
+
+$("cargarBase").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const lector = new FileReader();
+  lector.onload = ev => {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const filas = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      const hist = wb.Sheets[HOJA_HIST] ? XLSX.utils.sheet_to_json(wb.Sheets[HOJA_HIST]) : [];
+      const desg = wb.Sheets[HOJA_DESG] ? XLSX.utils.sheet_to_json(wb.Sheets[HOJA_DESG]) : [];
+      let cargadas = 0;
+      filas.forEach(f => {
+        const rec = {};
+        COLS.forEach(([titulo, clave]) => { rec[clave] = f[titulo] ?? ""; });
+        if (!String(rec.fruta || "").trim()) return;
+        rec.fruta = String(rec.fruta).trim();
+        rec.lote = String(rec.lote ?? "").trim();
+        NUMERICAS.forEach(k => rec[k] = parseFloat(rec[k]) || 0);
+        rec.codigo = String(f["Código"] || "").trim() || generarCodigo();
+        rec.ultimaModificacion = String(f["Última modificación"] || "");
+        rec.cambios = hist.filter(h => String(h["Código"]) === rec.codigo).map(h => ({
+          cuando: String(h["Fecha y hora"] || ""), campo: String(h["Campo"] || ""),
+          anterior: String(h["Valor anterior"] ?? ""), nuevo: String(h["Valor nuevo"] ?? ""),
+        }));
+        const fd = desg.find(d => String(d["Código"]) === rec.codigo);
+        if (fd) {
+          try { rec.entradas = JSON.parse(fd["Datos de entrada (JSON)"] || "{}"); } catch { rec.entradas = undefined; }
+          rec.desglose = {};
+          Object.keys(fd).forEach(k => { if (!["Código","Fruta","Lote","Datos de entrada (JSON)"].includes(k)) rec.desglose[k] = fd[k]; });
+        }
+        base = base.filter(x => claveRegistro(x) !== claveRegistro(rec));
+        base.push(rec); cargadas++;
+      });
+      ordenarBase(); guardarBase(); pintarBase(); llenarSelectCot();
+      alert(`Se cargaron ${cargadas} registro(s) desde el archivo.`);
+    } catch (err) {
+      alert("No se pudo leer el archivo. Usa uno descargado desde esta herramienta.");
+    }
+    e.target.value = "";
+  };
+  lector.readAsArrayBuffer(file);
+});
+
+// ---- Mezclas y empaques por gramaje ----
+const EMP_DEFAULT = [
+  { g: 50, bolsa: 0, etiqueta: 0, sellado: 0 }, { g: 100, bolsa: 0, etiqueta: 0, sellado: 0 },
+  { g: 250, bolsa: 0, etiqueta: 0, sellado: 0 }, { g: 500, bolsa: 0, etiqueta: 0, sellado: 0 },
+];
+let mezclas = [];
+let empaques = [];
+
+function cargarMezclasLocal() {
+  try { mezclas = JSON.parse(localStorage.getItem("mezclas-v1") || "[]"); } catch { mezclas = []; }
+  mezclas.forEach(m => m.ingredientes.forEach(i => { if (i.g === undefined) i.g = i.pct || 0; }));
+  try { empaques = JSON.parse(localStorage.getItem("empaques-v1") || "null") || EMP_DEFAULT.map(e => ({ ...e })); }
+  catch { empaques = EMP_DEFAULT.map(e => ({ ...e })); }
+}
+function guardarMezclasLocal() { localStorage.setItem("mezclas-v1", JSON.stringify(mezclas)); sincronizarArchivo(); }
+function guardarEmpaquesLocal() { localStorage.setItem("empaques-v1", JSON.stringify(empaques)); sincronizarArchivo(); }
+
+// Costo por gramo de la mezcla: (gramos de cada fruta × costo por gramo seco de esa fruta) ÷ gramos totales
+function costoMezclaGr(mz) {
+  let costo = 0, total = 0, sinCosto = 0;
+  mz.ingredientes.forEach(i => {
+    total += i.g;
+    const r = base.find(x => norm(etiqueta(x)) === norm(i.etq));
+    if (r) costo += i.g * (r.costoGrSeco || 0); else sinCosto++;
+  });
+  return { costo: total > 0 ? costo / total : 0, suma: total, sinCosto };
+}
+const precioPaquete = (mz, emp) =>
+  conMargen(emp.g * costoMezclaGr(mz).costo + emp.bolsa + emp.etiqueta + emp.sellado, mz.margen);
+
+function actualizarListasMezclas() {
+  const dl = $("listaIngBase");
+  dl.innerHTML = "";
+  base.forEach(r => { const o = document.createElement("option"); o.value = etiqueta(r); dl.appendChild(o); });
+}
+
+function addIngRow(etq = "", g = "") {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td><input type="text" class="ing-etq" list="listaIngBase" value="${etq}" placeholder="Fruta y lote" autocomplete="off"></td>
+    <td><input type="text" inputmode="decimal" class="ing-g num" value="${g}" placeholder="Ej: 100"></td>
+    <td><button class="danger small ing-del">✕</button></td>`;
+  $("tblIng").appendChild(tr);
+  tr.querySelectorAll("input").forEach(i => i.addEventListener("input", actualizarMezclaPreview));
+  tr.querySelector(".ing-del").addEventListener("click", () => { tr.remove(); actualizarMezclaPreview(); });
+}
+
+function leerIng() {
+  return [...$("tblIng").querySelectorAll("tr")].map(tr => ({
+    etq: tr.querySelector(".ing-etq").value.trim(),
+    g: evalExpr(tr.querySelector(".ing-g").value) || 0,
+  })).filter(i => i.etq);
+}
+
+function actualizarMezclaPreview() {
+  const ing = leerIng();
+  const { costo, suma, sinCosto } = costoMezclaGr({ ingredientes: ing });
+  $("mzSuma").textContent = fmtN(suma, 0) + " g";
+  $("mzDesglose").textContent = suma > 0
+    ? "Participación de cada fruta: " + ing.map(i => `${i.etq} ${fmtN(i.g / suma * 100, 1)} %`).join(" · ")
+    : "";
+  $("mzCostoGr").textContent = fmt2(costo);
+  $("mzPrecioGr").textContent = fmt2(conMargen(costo, num("mzMargen")));
+  const av = [];
+  if (ing.length && suma <= 0) av.push("Indica los gramos de cada fruta.");
+  if (sinCosto) av.push("Hay frutas que no están en la base o no tienen costo por gramo. Calcúlalas y guárdalas en la sección 8.");
+  $("mzAviso").textContent = av.join(" ");
+}
+
+function pintarMezclas() {
+  const tb = $("tblMezclas");
+  tb.innerHTML = mezclas.length ? "" : `<tr><td colspan="5" style="color:var(--muted)">Aún no hay mezclas guardadas.</td></tr>`;
+  mezclas.forEach((m, i) => {
+    const { costo } = costoMezclaGr(m);
+    const t = m.ingredientes.reduce((s, x) => s + x.g, 0);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${m.nombre}</td>
+      <td>${m.ingredientes.map(x => `${x.etq} ${fmtN(x.g, 0)} g (${fmtN(t ? x.g / t * 100 : 0, 1)} %)`).join(", ")}</td>
+      <td class="num">${fmt2(costo)}</td><td class="num">${fmtN(m.margen, 1)}</td>
+      <td><button class="danger small">✕</button></td>`;
+    tr.querySelector("button").addEventListener("click", () => {
+      mezclas.splice(i, 1); guardarMezclasLocal(); pintarMezclas(); llenarSelMezclas();
+    });
+    tb.appendChild(tr);
+  });
+}
+
+function pintarEmpaques() {
+  const tb = $("tblEmp");
+  tb.innerHTML = "";
+  empaques.forEach((e, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><input type="text" inputmode="decimal" class="emp-g num" value="${e.g}"></td>
+      <td><input type="text" inputmode="decimal" class="emp-bolsa num" value="${e.bolsa}"></td>
+      <td><input type="text" inputmode="decimal" class="emp-etq num" value="${e.etiqueta}"></td>
+      <td><input type="text" inputmode="decimal" class="emp-sell num" value="${e.sellado}"></td>
+      <td><button class="danger small">✕</button></td>`;
+    tr.querySelectorAll("input").forEach(inp => inp.addEventListener("input", leerEmpaquesDesdeTabla));
+    tr.querySelector("button").addEventListener("click", () => {
+      empaques.splice(i, 1); guardarEmpaquesLocal(); pintarEmpaques(); llenarSelMezclas();
+    });
+    tb.appendChild(tr);
+  });
+}
+
+function leerEmpaquesDesdeTabla() {
+  empaques = [...$("tblEmp").querySelectorAll("tr")].map(tr => ({
+    g: evalExpr(tr.querySelector(".emp-g").value) || 0,
+    bolsa: evalExpr(tr.querySelector(".emp-bolsa").value) || 0,
+    etiqueta: evalExpr(tr.querySelector(".emp-etq").value) || 0,
+    sellado: evalExpr(tr.querySelector(".emp-sell").value) || 0,
+  }));
+  guardarEmpaquesLocal();
+  llenarSelMezclas();
+}
+
+function llenarSelMezclas() {
+  const sm = $("selMezcla"), sg = $("selGramaje");
+  const pm = sm.value, pg = sg.value;
+  sm.innerHTML = "";
+  if (!mezclas.length) {
+    const o = document.createElement("option"); o.value = ""; o.textContent = "Sin mezclas guardadas"; sm.appendChild(o);
+  } else {
+    mezclas.forEach(m => { const o = document.createElement("option"); o.value = m.nombre; o.textContent = m.nombre; sm.appendChild(o); });
+    if (mezclas.some(m => m.nombre === pm)) sm.value = pm;
+  }
+  sg.value = pg;
+  const dlg = $("listaGramajes");
+  dlg.innerHTML = "";
+  empaques.filter(e => e.g > 0).forEach(e => { const o = document.createElement("option"); o.value = String(e.g); dlg.appendChild(o); });
+  prefillEmpaqueGramaje();
+  actualizarInfoMezcla();
+}
+
+function actualizarInfoMezcla() {
+  const mz = mezclas.find(m => m.nombre === $("selMezcla").value);
+  const emp = empaqueActual();
+  if (!mz || !emp) { $("mzInfo").textContent = "Guarda una mezcla y define un gramaje para cotizar."; return; }
+  const paq = Math.max(1, Math.floor(num("mzPaq")));
+  const pp = precioPaquete(mz, emp);
+  $("mzInfo").textContent =
+    `Precio por paquete de ${emp.g} g: ${fmt(pp)} (incluye empaque de ${fmt(emp.bolsa + emp.etiqueta + emp.sellado)}). ` +
+    `Total de ${paq} paquete(s): ${fmt(paq * pp)} por ${fmtN(paq * emp.g, 0)} g.`;
+}
+
+$("mzAddIng").addEventListener("click", () => { addIngRow(); actualizarMezclaPreview(); });
+$("mzMargen").addEventListener("input", actualizarMezclaPreview);
+$("mzGuardar").addEventListener("click", () => {
+  const nombre = $("mzNombre").value.trim();
+  const ing = leerIng();
+  if (!nombre) { alert("Escribe el nombre de la mezcla."); return; }
+  if (!ing.length) { alert("Agrega al menos una fruta a la mezcla."); return; }
+  const suma = ing.reduce((s, i) => s + i.g, 0);
+  if (!(suma > 0)) { alert("Indica los gramos de cada fruta."); return; }
+  mezclas = mezclas.filter(m => norm(m.nombre) !== norm(nombre));
+  mezclas.push({ nombre, margen: num("mzMargen"), ingredientes: ing });
+  guardarMezclasLocal(); pintarMezclas(); llenarSelMezclas();
+});
+$("empAdd").addEventListener("click", () => {
+  empaques.push({ g: 0, bolsa: 0, etiqueta: 0, sellado: 0 }); pintarEmpaques();
+});
+$("selMezcla").addEventListener("change", actualizarInfoMezcla);
+$("selGramaje").addEventListener("input", () => { prefillEmpaqueGramaje(); actualizarInfoMezcla(); });
+["gBolsa", "gEtiq", "gSell"].forEach(id => $(id).addEventListener("input", () => { guardarEmpaqueDesdeCampos(); actualizarInfoMezcla(); }));
+
+// Empaque del gramaje indicado (puede ser cualquiera, no solo los de la tabla)
+function empaqueActual() {
+  const g = evalExpr($("selGramaje").value) || 0;
+  if (g <= 0) return null;
+  return { g, bolsa: num("gBolsa"), etiqueta: num("gEtiq"), sellado: num("gSell") };
+}
+function prefillEmpaqueGramaje() {
+  const g = evalExpr($("selGramaje").value) || 0;
+  const e = empaques.find(x => Number(x.g) === g);
+  $("gBolsa").value = e ? e.bolsa : 0;
+  $("gEtiq").value = e ? e.etiqueta : 0;
+  $("gSell").value = e ? e.sellado : 0;
+}
+function guardarEmpaqueDesdeCampos() {
+  const g = evalExpr($("selGramaje").value) || 0;
+  if (g <= 0) return;
+  const datos = { g, bolsa: num("gBolsa"), etiqueta: num("gEtiq"), sellado: num("gSell") };
+  const i = empaques.findIndex(x => Number(x.g) === g);
+  if (i >= 0) empaques[i] = datos; else empaques.push(datos);
+  guardarEmpaquesLocal(); pintarEmpaques();
+}
+$("mzPaq").addEventListener("input", actualizarInfoMezcla);
+
+$("mzAgregar").addEventListener("click", () => {
+  const mz = mezclas.find(m => m.nombre === $("selMezcla").value);
+  const emp = empaqueActual();
+  if (!mz || !emp) { alert("Guarda una mezcla e indica un gramaje (g)."); return; }
+  if (costoMezclaGr(mz).costo <= 0) { alert("La mezcla no tiene costo calculable. Revisa que las frutas estén en la base."); return; }
+  const paq = Math.max(1, Math.floor(num("mzPaq")));
+  const pp = precioPaquete(mz, emp);
+  const kg = paq * emp.g / 1000;
+  const subtotal = paq * pp;
+  itemsCot.push({ fruta: `Mezcla ${mz.nombre} (${emp.g} g)`, kg, precioKg: subtotal / kg, paquetes: paq, subtotal });
+  pintarCot();
+});
+
+// ---- Cotización ----
+function pintarCot() {
+  const tb = $("tblCot");
+  tb.innerHTML = itemsCot.length ? "" : `<tr><td colspan="6" style="color:var(--muted)">Sin ítems. Elige la fruta y lote, indica la cantidad y agrega el ítem.</td></tr>`;
+  itemsCot.forEach((it, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${it.fruta}</td><td class="num">${fmtN(it.kg)}</td>
+      <td class="num">${fmt(it.precioKg)}</td><td class="num">${fmtN(it.paquetes, 0)}</td>
+      <td class="num">${fmt(it.subtotal)}</td>
+      <td><button class="danger small">✕</button></td>`;
+    tr.querySelector("button").addEventListener("click", () => { itemsCot.splice(i, 1); pintarCot(); });
+    tb.appendChild(tr);
+  });
+  const sub = itemsCot.reduce((s, it) => s + it.subtotal, 0);
+  const ivaVal = sub * num("iva") / 100;
+  $("cotSub").textContent = fmt(sub);
+  $("cotIva").textContent = fmt(ivaVal);
+  $("cotTotal").textContent = fmt(sub + ivaVal);
+}
+
+$("frutaCot").addEventListener("input", mostrarPrecioCot);
+$("frutaCot").addEventListener("change", mostrarPrecioCot);
+$("cantKg").addEventListener("input", mostrarPrecioCot);
+$("iva").addEventListener("input", pintarCot);
+
+$("agregarItem").addEventListener("click", () => {
+  const r = registroCot();
+  if (!r) { alert("Esa fruta y lote no están en la base. Calcúlalos y guárdalos en la sección 8."); return; }
+  const kg = num("cantKg");
+  if (kg <= 0) { alert("Indica la cantidad en kg que requiere el cliente."); return; }
+  const paquetes = r.presGr > 0 ? Math.floor(kg * 1000 / r.presGr) : 0;
+  itemsCot.push({ fruta: etiqueta(r), kg, precioKg: r.precioKg, paquetes, subtotal: kg * r.precioKg });
+  pintarCot();
+});
+
+$("limpiarCot").addEventListener("click", () => {
+  if (confirm("¿Vaciar la cotización?")) { itemsCot = []; pintarCot(); }
+});
+
+$("exportarCot").addEventListener("click", () => {
+  if (!itemsCot.length) { alert("La cotización no tiene ítems."); return; }
+  const sub = itemsCot.reduce((s, it) => s + it.subtotal, 0);
+  const ivaPct = num("iva");
+  const ivaVal = sub * ivaPct / 100;
+  const hoy = new Date().toLocaleDateString("es-CO");
+
+  const filas = [
+    ["COTIZACIÓN"],
+    ["Diseños y Soluciones 3D"],
+    [],
+    ["Cliente", $("cliente").value || "-"],
+    ["Número", $("numCot").value],
+    ["Fecha", hoy],
+    ["Validez (días)", num("validez")],
+    [],
+    ["Fruta", "Cantidad (kg)", "Precio por kg (COP)", "Paquetes aprox.", "Subtotal (COP)"],
+    ...itemsCot.map(it => [it.fruta, +it.kg.toFixed(2), Math.round(it.precioKg), it.paquetes, Math.round(it.subtotal)]),
+    [],
+    ["", "", "", "Subtotal", Math.round(sub)],
+    ["", "", "", `IVA (${ivaPct} %)`, Math.round(ivaVal)],
+    ["", "", "", "Total", Math.round(sub + ivaVal)],
+    [],
+    [`Oferta válida por ${num("validez")} días desde la fecha de emisión.`],
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(filas);
+  ws["!cols"] = [{ wch: 28 }, { wch: 16 }, { wch: 20 }, { wch: 18 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(wb, ws, "Cotización");
+  const cli = $("cliente").value ? "_" + $("cliente").value.replace(/[^\w\-]+/g, "_") : "";
+  XLSX.writeFile(wb, `${$("numCot").value}${cli}.xlsx`);
+});
+
+// ---- Informe ----
+function tramosCantidad() {
+  return $("tramos").value.split(",").map(s => parseFloat(s)).filter(x => x > 0).sort((a, b) => a - b);
+}
+
+function construirInforme() {
+  const tramos = tramosCantidad();
+  const share = num("share") / 100;
+  const descMax = num("descMax");
+  const margenMin = num("margenMin") / 100;
+
+  const resumen = [];
+  const descuentos = [];
+  const conclusiones = [];
+
+  base.forEach(r => {
+    const kgBase = r.kgSeco;
+    const fijo = r.costoFijo || 0;
+    const variable = Math.max(r.costoTotal - fijo, 0);
+    const unitBase = kgBase > 0 ? r.costoTotal / kgBase : 0;
+    const utilKg = r.precioKg - unitBase;
+    const margenReal = r.precioKg > 0 ? (r.precioKg - unitBase) / r.precioKg * 100 : 0;
+
+    resumen.push({
+      Código: r.codigo, Fruta: r.fruta, Lote: r.lote || "-", Fecha: r.fecha, "Kg secos": +kgBase.toFixed(2),
+      "Rendimiento (%)": +r.rend.toFixed(1), "Costo total (COP)": Math.round(r.costoTotal),
+      "Costo fijo lote (COP)": Math.round(fijo), "Costo por kg (COP)": Math.round(unitBase),
+      "Precio por kg (COP)": Math.round(r.precioKg), "Precio por paquete (COP)": Math.round(r.precioPaq),
+      "Utilidad por kg (COP)": Math.round(utilKg), "Margen (%)": +margenReal.toFixed(1),
+    });
+
+    tramos.forEach(Q => {
+      const unitQ = variable / kgBase + fijo / Q;
+      const ahorroPct = unitBase > 0 ? (unitBase - unitQ) / unitBase : 0;
+      let d = Math.max(0, ahorroPct) * share * 100;
+      d = Math.min(d, descMax);
+      const dPorMargen = r.precioKg > 0 && margenMin < 1 ? (1 - unitQ / ((1 - margenMin) * r.precioKg)) * 100 : 0;
+      d = Math.max(0, Math.min(d, dPorMargen));
+      const precioFinal = r.precioKg * (1 - d / 100);
+      const margenFinal = precioFinal > 0 ? (precioFinal - unitQ) / precioFinal * 100 : 0;
+      descuentos.push({
+        Código: r.codigo, Fruta: r.fruta, Lote: r.lote || "-", "Cantidad desde (kg)": Q, "Costo por kg a esa cantidad (COP)": Math.round(unitQ),
+        "Precio lista por kg (COP)": Math.round(r.precioKg), "Descuento sugerido (%)": +d.toFixed(1),
+        "Precio con descuento (COP)": Math.round(precioFinal), "Margen con descuento (%)": +margenFinal.toFixed(1),
+      });
+    });
+  });
+
+  if (base.length) {
+    const nom = x => x.Lote && x.Lote !== "-" ? `${x.Fruta} – ${x.Lote}` : x.Fruta;
+    const porUtil = [...resumen].sort((a, b) => b["Utilidad por kg (COP)"] - a["Utilidad por kg (COP)"]);
+    const porRend = [...resumen].sort((a, b) => a["Rendimiento (%)"] - b["Rendimiento (%)"]);
+    const porPrecio = [...resumen].sort((a, b) => b["Precio por kg (COP)"] - a["Precio por kg (COP)"]);
+    conclusiones.push(`Lote con mayor utilidad por kg: ${nom(porUtil[0])} (${fmt(porUtil[0]["Utilidad por kg (COP)"])} por kg).`);
+    conclusiones.push(`Lote con mayor precio por kg: ${nom(porPrecio[0])} (${fmt(porPrecio[0]["Precio por kg (COP)"])}).`);
+    conclusiones.push(`Rendimiento más bajo: ${nom(porRend[0])} (${fmtN(porRend[0]["Rendimiento (%)"], 1)} %). Un rendimiento bajo sube el costo por kg; conviene revisar pelado, corte y tiempo de secado.`);
+    const maxDesc = descuentos.reduce((m, d) => Math.max(m, d["Descuento sugerido (%)"]), 0);
+    conclusiones.push(`El descuento sugerido más alto es de ${fmtN(maxDesc, 1)} % y solo aplica en los tramos de mayor cantidad.`);
+    const sinFijo = base.filter(r => !r.costoFijo);
+    if (sinFijo.length) conclusiones.push(`Estos registros se guardaron sin costo fijo del lote y no tienen descuento por cantidad: ${sinFijo.map(etiqueta).join(", ")}. Vuelve a calcularlos y guárdalos.`);
+    if (tramos.length === 0) conclusiones.push("No hay tramos de cantidad válidos. Escribe los kg separados por coma, por ejemplo 5,10,25,50.");
+  } else {
+    conclusiones.push("Guarda al menos una fruta en la base para generar el informe.");
+  }
+
+  return { resumen, descuentos, conclusiones };
+}
+
+function tablaHTML(filas) {
+  if (!filas.length) return "<p class='hint'>Sin datos.</p>";
+  const cols = Object.keys(filas[0]);
+  return `<div style="overflow-x:auto"><table class="small-table"><thead><tr>${cols.map((c, i) => `<th ${i ? 'class="num"' : ""}>${c}</th>`).join("")}</tr></thead>
+    <tbody>${filas.map(f => `<tr>${cols.map((c, i) => {
+      const v = f[c];
+      const txt = typeof v === "number" && /\(COP\)/.test(c) ? fmt(v) : (typeof v === "number" ? fmtN(v, 1) : v);
+      return `<td ${i ? 'class="num"' : ""}>${txt}</td>`;
+    }).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function mostrarInforme() {
+  const inf = construirInforme();
+  $("informe").innerHTML = `
+    <h3>Resumen por fruta y lote</h3>${tablaHTML(inf.resumen)}
+    <h3>Precio y descuento sugerido por cantidad</h3>${tablaHTML(inf.descuentos)}
+    <h3>Conclusiones</h3><ul>${inf.conclusiones.map(c => `<li>${c}</li>`).join("")}</ul>
+    <p class="hint">Cómo se calcula: el costo por kg a cada cantidad reparte los costos fijos del lote (transporte) entre los kg del pedido. El descuento sugerido es el porcentaje del ahorro que se comparte con el cliente, con tope de descuento máximo y sin bajar el margen mínimo.</p>`;
+  return inf;
+}
+
+$("generarInforme").addEventListener("click", mostrarInforme);
+
+$("descargarInforme").addEventListener("click", () => {
+  if (!base.length) { alert("Guarda al menos una fruta en la base."); return; }
+  const inf = construirInforme();
+  const wb = XLSX.utils.book_new();
+
+  const ws1 = XLSX.utils.json_to_sheet(inf.resumen);
+  ws1["!cols"] = Object.keys(inf.resumen[0]).map(k => ({ wch: Math.max(14, k.length + 2) }));
+  XLSX.utils.book_append_sheet(wb, ws1, "Resumen por fruta");
+
+  const ws2 = XLSX.utils.json_to_sheet(inf.descuentos);
+  ws2["!cols"] = Object.keys(inf.descuentos[0] || { a: 1 }).map(k => ({ wch: Math.max(16, k.length + 2) }));
+  XLSX.utils.book_append_sheet(wb, ws2, "Descuentos por cantidad");
+
+  const ws3 = XLSX.utils.aoa_to_sheet([["Conclusiones"], ...inf.conclusiones.map(c => [c]),
+    [], ["Supuestos"],
+    [`Porcentaje del ahorro compartido: ${num("share")} %`],
+    [`Descuento máximo: ${num("descMax")} %`],
+    [`Margen mínimo después del descuento: ${num("margenMin")} %`],
+    [`Tramos de cantidad (kg): ${tramosCantidad().join(", ")}`],
+  ]);
+  ws3["!cols"] = [{ wch: 110 }];
+  XLSX.utils.book_append_sheet(wb, ws3, "Conclusiones");
+
+  XLSX.writeFile(wb, `informe-costos-frutas-${new Date().toISOString().slice(0,10)}.xlsx`);
+});
+
+// ---- Eventos ----
+document.querySelectorAll("#fruta, #lote, #valorComprado, #precioLb, #lbCompradas, #kgAntes, #kgDespues, #precioKwh, #presGr, #costoBolsa, #costoEtiqueta, #costoSellado, #minProceso, #valorMin, #personas, #transporte, #utilidad")
+  .forEach(el => el.addEventListener("input", calcular));
+document.querySelectorAll("#tramos, #share, #descMax, #margenMin").forEach(el => el.addEventListener("input", () => {
+  if ($("informe").innerHTML) mostrarInforme();
+}));
+
+// Vista previa del resultado en los campos que aceptan fórmulas
+document.querySelectorAll("input.formula").forEach(el => {
+  const p = document.createElement("div");
+  p.className = "hint";
+  el.insertAdjacentElement("afterend", p);
+  const actualizar = () => {
+    const t = el.value.trim();
+    const v = evalExpr(t);
+    p.textContent = !t ? "" : (isNaN(v) ? "Fórmula no válida" : `Resultado: ${fmtN(v, 2)}`);
+  };
+  el.addEventListener("input", actualizar);
+  actualizar();
+});
+
+// Equipos precargados (con consumo, vida útil y valor de compra)
+addEquipoRow({ nombre: "Deshidratador 10 bandejas (1000 W)", kw: 0.6,  horas: 0, valor: 2250000, vida: 6000 });
+addEquipoRow({ nombre: "Deshidratador 18 bandejas (800 W)",  kw: 0.45, horas: 0, valor: 1660000, vida: 5000 });
+addEquipoRow({ nombre: "Deshidratador 6 bandejas (500 W)",   kw: 0.3,  horas: 0, valor: 903210,  vida: 4500 });
+
+// ---- Compras de fruta: registro y análisis por periodo ----
+let compras = [];
+const PERIODOS = { mes: "Mensual", bimestre: "Bimestral", trimestre: "Trimestral", semestre: "Semestral", anio: "Anual" };
+function cargarComprasLocal() { try { compras = JSON.parse(localStorage.getItem("compras-v1") || "[]"); } catch { compras = []; } }
+function guardarComprasLocal() { localStorage.setItem("compras-v1", JSON.stringify(compras)); sincronizarArchivo(); }
+
+// Agrupa una fecha "AAAA-MM-DD" según el periodo elegido
+function claveFecha(fechaIso, tipo) {
+  const [y, m] = String(fechaIso || "").split("-").map(Number);
+  if (!y || !m) return "Sin fecha";
+  switch (tipo) {
+    case "mes": return `${y}-${String(m).padStart(2, "0")}`;
+    case "bimestre": return `${y} · bimestre ${Math.ceil(m / 2)}`;
+    case "trimestre": return `${y} · trimestre ${Math.ceil(m / 3)}`;
+    case "semestre": return `${y} · semestre ${m <= 6 ? 1 : 2}`;
+    default: return `${y}`;
+  }
+}
+// Precio por kg ponderado por kilos de cada periodo: total pagado ÷ total de kilos
+function agregarPorPeriodo(items, tipo) {
+  const g = {};
+  items.forEach(it => {
+    if (!(it.kg > 0) || !(it.valor > 0)) return;
+    const k = claveFecha(it.fecha, tipo);
+    g[k] = g[k] || { periodo: k, valor: 0, kg: 0, n: 0 };
+    g[k].valor += it.valor; g[k].kg += it.kg; g[k].n++;
+  });
+  return Object.values(g).map(x => ({ ...x, precioKg: x.valor / x.kg })).sort((a, b) => a.periodo.localeCompare(b.periodo));
+}
+function tablaPeriodos(filas) {
+  if (!filas.length) return "<p class='hint'>Sin datos para este periodo.</p>";
+  const max = Math.max(...filas.map(f => f.precioKg));
+  return `<table class="small-table"><thead><tr><th>Periodo</th><th class="num">Registros</th><th class="num">Precio/kg</th><th>Comparación</th></tr></thead><tbody>${
+    filas.map((f, i) => {
+      const prev = i > 0 ? filas[i - 1].precioKg : null;
+      const variacion = prev ? (f.precioKg - prev) / prev * 100 : null;
+      const txtVar = variacion === null ? "" : ` <span class="hint">(${variacion >= 0 ? "+" : ""}${fmtN(variacion, 1)} % vs anterior)</span>`;
+      return `<tr><td>${f.periodo}</td><td class="num">${f.n}</td><td class="num">${fmt2(f.precioKg)}${txtVar}</td>
+        <td><div style="background:var(--accent-2);height:10px;border-radius:4px;width:${Math.max(4, f.precioKg / max * 100)}%"></div></td></tr>`;
+    }).join("")}</tbody></table>`;
+}
+
+function actualizarPrecioCompra() {
+  const kg = evalExpr($("cpKg").value) || 0;
+  const valor = evalExpr($("cpValor").value) || 0;
+  $("cpPrecio").textContent = `Precio por kg: ${kg > 0 && valor > 0 ? fmt2(valor / kg) : "—"}`;
+}
+function pintarCompras() {
+  const tb = $("tblCompras");
+  tb.innerHTML = compras.length ? "" : `<tr><td colspan="7" style="color:var(--muted)">Aún no hay compras registradas.</td></tr>`;
+  compras.forEach((c, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${c.fecha}</td><td>${c.fruta}</td><td>${c.proveedor || "-"}</td>
+      <td class="num">${fmtN(c.kg, 2)}</td><td class="num">${fmt(c.valor)}</td><td class="num">${fmt2(c.valor / c.kg)}</td>
+      <td><button class="danger small">✕</button></td>`;
+    tr.querySelector("button").addEventListener("click", () => {
+      compras.splice(i, 1); guardarComprasLocal(); pintarCompras(); analizarCompras();
+    });
+    tb.appendChild(tr);
+  });
+}
+function nombresFrutas(lista) {
+  return [...new Set([...FRUTAS, ...lista])].sort((a, b) => a.localeCompare(b, "es"));
+}
+function actualizarSelFrutasAnalisis() {
+  const s = $("anFruta");
+  const prev = s.value;
+  s.innerHTML = "";
+  nombresFrutas(compras.map(c => c.fruta)).forEach(n => { const o = document.createElement("option"); o.value = n; o.textContent = n; s.appendChild(o); });
+  if (prev) s.value = prev;
+  analizarCompras();
+}
+function analizarCompras() {
+  const fruta = $("anFruta").value;
+  const tipo = $("anPeriodo").value;
+  const items = compras.filter(c => norm(c.fruta) === norm(fruta)).map(c => ({ fecha: c.fecha, valor: c.valor, kg: c.kg }));
+  $("anCompras").innerHTML = `<h3>${fruta}: precio de compra ${PERIODOS[tipo].toLowerCase()}</h3>` + tablaPeriodos(agregarPorPeriodo(items, tipo));
+}
+$("cpKg").addEventListener("input", actualizarPrecioCompra);
+$("cpValor").addEventListener("input", actualizarPrecioCompra);
+$("cpGuardar").addEventListener("click", () => {
+  const fruta = $("cpFruta").value.trim();
+  const kg = evalExpr($("cpKg").value) || 0;
+  const valor = evalExpr($("cpValor").value) || 0;
+  const fecha = $("cpFecha").value;
+  if (!fecha || !fruta || !(kg > 0) || !(valor > 0)) { alert("Indica fecha, fruta, kg comprados y valor pagado."); return; }
+  compras.push({ fecha, fruta, kg, valor, proveedor: $("cpProv").value.trim(), ref: $("cpRef").value.trim() });
+  compras.sort((a, b) => a.fecha.localeCompare(b.fecha));
+  guardarComprasLocal(); pintarCompras(); actualizarSelFrutasAnalisis();
+  $("cpKg").value = "0"; $("cpValor").value = "0"; actualizarPrecioCompra();
+});
+$("anFruta").addEventListener("change", analizarCompras);
+$("anPeriodo").addEventListener("change", analizarCompras);
+
+// ---- Pedidos de producción ----
+let pedidos = [];
+const ESTADOS = ["Pendiente", "En proceso", "Entregado", "Cancelado"];
+function cargarPedidosLocal() { try { pedidos = JSON.parse(localStorage.getItem("pedidos-v1") || "[]"); } catch { pedidos = []; } }
+function guardarPedidosLocal() { localStorage.setItem("pedidos-v1", JSON.stringify(pedidos)); sincronizarArchivo(); }
+function siguienteLote() {
+  const anio = new Date().getFullYear();
+  const prefijo = `PRD-${anio}-`;
+  const max = pedidos.filter(p => p.lote.startsWith(prefijo))
+    .reduce((m, p) => Math.max(m, parseInt(p.lote.slice(prefijo.length)) || 0), 0);
+  return prefijo + String(max + 1).padStart(4, "0");
+}
+function clientesUnicos() {
+  return [...new Set(pedidos.map(p => p.cliente))].sort((a, b) => a.localeCompare(b, "es"));
+}
+function actualizarPedidos() {
+  const dl = $("listaClientes");
+  dl.innerHTML = "";
+  clientesUnicos().forEach(c => { const o = document.createElement("option"); o.value = c; dl.appendChild(o); });
+  const sel = $("pdFiltroCliente");
+  const prev = sel.value;
+  sel.innerHTML = `<option value="__todos__">Todos los clientes</option>`;
+  clientesUnicos().forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o); });
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+  pintarPedidos();
+}
+function pintarPedidos() {
+  const f = $("pdFiltroCliente").value;
+  const lista = pedidos.filter(p => f === "__todos__" || norm(p.cliente) === norm(f));
+  const tb = $("tblPedidos");
+  tb.innerHTML = lista.length ? "" : `<tr><td colspan="7" style="color:var(--muted)">Aún no hay pedidos para mostrar.</td></tr>`;
+  lista.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${p.lote}</td><td>${p.cliente}</td><td>${p.fabricacion}</td><td>${p.entrega || "-"}</td>
+      <td>${p.estado}</td><td class="num">${fmt(p.cotizacion.total)}</td>
+      <td><button class="ghost small">Ver</button> <button class="danger small">✕</button></td>`;
+    const [bVer, bDel] = tr.querySelectorAll("button");
+    bVer.addEventListener("click", () => mostrarPedido(p.lote));
+    bDel.addEventListener("click", () => {
+      if (!confirm(`¿Eliminar el pedido ${p.lote}?`)) return;
+      pedidos = pedidos.filter(x => x !== p); guardarPedidosLocal(); actualizarPedidos(); $("pdDetalle").innerHTML = "";
+    });
+    tb.appendChild(tr);
+  });
+  const totalCliente = lista.reduce((s, p) => s + p.cotizacion.total, 0);
+  $("pdResumen").value = f === "__todos__" ? `${lista.length} pedido(s)` : `${lista.length} pedido(s) · ${fmt(totalCliente)}`;
+}
+function mostrarPedido(lote) {
+  const p = pedidos.find(x => x.lote === lote);
+  if (!p) return;
+  const opciones = ESTADOS.map(e => `<option ${e === p.estado ? "selected" : ""}>${e}</option>`).join("");
+  $("pdDetalle").innerHTML = `
+    <h3>Lote ${p.lote} · ${p.cliente}</h3>
+    <p class="hint">Fabricación: ${p.fabricacion} · Entrega: ${p.entrega || "-"} · Creado: ${p.creado}</p>
+    <div class="grid">
+      <label>Estado<select id="pdEstadoDet">${opciones}</select></label>
+      <label>Observaciones<input id="pdObsDet" type="text" value="${p.obs || ""}"></label>
+    </div>
+    <div class="actions">
+      <button id="pdGuardarDet">Guardar seguimiento</button>
+      <button class="ghost" id="pdOrden">Descargar orden de producción (.xlsx)</button>
+    </div>
+    <h3>Cotización del momento del pedido (${p.cotizacion.numero}, ${p.cotizacion.fecha})</h3>
+    <table class="small-table">
+      <thead><tr><th>Fruta / producto</th><th class="num">Kg</th><th class="num">Precio/kg</th><th class="num">Paquetes</th><th class="num">Subtotal</th></tr></thead>
+      <tbody>${p.cotizacion.items.map(i => `<tr><td>${i.fruta}</td><td class="num">${fmtN(i.kg)}</td><td class="num">${fmt(i.precioKg)}</td><td class="num">${fmtN(i.paquetes, 0)}</td><td class="num">${fmt(i.subtotal)}</td></tr>`).join("")}</tbody>
+      <tfoot>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">Subtotal</td><td class="num">${fmt(p.cotizacion.subtotal)}</td></tr>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">IVA (${p.cotizacion.ivaPct} %)</td><td class="num">${fmt(p.cotizacion.iva)}</td></tr>
+        <tr class="tot-row"><td colspan="4" style="text-align:right">Total</td><td class="num">${fmt(p.cotizacion.total)}</td></tr>
+      </tfoot>
+    </table>
+    <h3>Seguimiento</h3>
+    <table class="small-table">
+      <thead><tr><th>Fecha y hora</th><th>Estado</th><th>Nota</th></tr></thead>
+      <tbody>${p.seguimiento.slice().reverse().map(s => `<tr><td>${s.cuando}</td><td>${s.estado}</td><td>${s.nota}</td></tr>`).join("")}</tbody>
+    </table>`;
+  $("pdGuardarDet").addEventListener("click", () => {
+    const nuevoEstado = $("pdEstadoDet").value;
+    const nuevaObs = $("pdObsDet").value.trim();
+    if (nuevoEstado !== p.estado) p.seguimiento.push({ cuando: ahoraStr(), estado: nuevoEstado, nota: `Cambio de estado: ${p.estado} → ${nuevoEstado}` });
+    if (nuevaObs !== (p.obs || "")) p.seguimiento.push({ cuando: ahoraStr(), estado: nuevoEstado, nota: "Observaciones actualizadas" });
+    p.estado = nuevoEstado; p.obs = nuevaObs;
+    guardarPedidosLocal(); pintarPedidos(); mostrarPedido(p.lote);
+  });
+  $("pdOrden").addEventListener("click", () => exportarOrden(p));
+}
+function exportarOrden(p) {
+  const wb = XLSX.utils.book_new();
+  const datos = [
+    ["ORDEN DE PRODUCCIÓN"], ["Diseños y Soluciones 3D"], [],
+    ["Lote", p.lote], ["Cliente", p.cliente], ["Fecha de fabricación", p.fabricacion],
+    ["Fecha de entrega", p.entrega || "-"], ["Estado", p.estado], ["Observaciones", p.obs || "-"],
+    ["Creado", p.creado], [],
+    ["Cotización", p.cotizacion.numero], ["Fecha de cotización", p.cotizacion.fecha], ["Validez (días)", p.cotizacion.validez], [],
+    ["Fruta / producto", "Kg", "Precio por kg (COP)", "Paquetes", "Subtotal (COP)"],
+    ...p.cotizacion.items.map(i => [i.fruta, +i.kg.toFixed(2), Math.round(i.precioKg), i.paquetes, Math.round(i.subtotal)]),
+    [], ["", "", "", "Subtotal", Math.round(p.cotizacion.subtotal)],
+    ["", "", "", `IVA (${p.cotizacion.ivaPct} %)`, Math.round(p.cotizacion.iva)],
+    ["", "", "", "Total", Math.round(p.cotizacion.total)],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(datos);
+  ws["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 20 }, { wch: 14 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(wb, ws, "Orden");
+  XLSX.writeFile(wb, `orden-${p.lote}.xlsx`);
+}
+$("pdFiltroCliente").addEventListener("change", pintarPedidos);
+$("pdCrear").addEventListener("click", () => {
+  const cliente = $("pdCliente").value.trim();
+  const fabricacion = $("pdFecha").value;
+  if (!cliente || !fabricacion) { alert("Indica el cliente y la fecha de fabricación."); return; }
+  if (!itemsCot.length) { alert("Primero agrega ítems en la cotización (sección 10): el pedido guarda esa cotización."); return; }
+  const sub = itemsCot.reduce((s, i) => s + i.subtotal, 0);
+  const ivaPct = num("iva");
+  const iva = sub * ivaPct / 100;
+  const p = {
+    lote: siguienteLote(), cliente, fabricacion, entrega: $("pdEntrega").value || "",
+    estado: $("pdEstado").value, obs: $("pdObs").value.trim(), creado: ahoraStr(),
+    cotizacion: {
+      numero: $("numCot").value, fecha: new Date().toLocaleDateString("es-CO"),
+      items: itemsCot.map(i => ({ ...i })), subtotal: sub, ivaPct, iva, total: sub + iva, validez: num("validez"),
+    },
+    seguimiento: [{ cuando: ahoraStr(), estado: $("pdEstado").value, nota: "Pedido creado" }],
+  };
+  pedidos.unshift(p); guardarPedidosLocal();
+  $("pdAviso").textContent = `Pedido ${p.lote} creado para ${cliente}.`;
+  $("pdCliente").value = ""; $("pdObs").value = "";
+  actualizarPedidos(); mostrarPedido(p.lote);
+});
+$("pdExportar").addEventListener("click", () => {
+  if (!pedidos.length) { alert("No hay pedidos para exportar."); return; }
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(pedidos.map(p => ({
+    Lote: p.lote, Cliente: p.cliente, "Fecha de fabricación": p.fabricacion, "Fecha de entrega": p.entrega || "-",
+    Estado: p.estado, Observaciones: p.obs || "-", "Cotización": p.cotizacion.numero,
+    "Fecha de cotización": p.cotizacion.fecha, "Total (COP)": Math.round(p.cotizacion.total), Creado: p.creado,
+  })));
+  XLSX.utils.book_append_sheet(wb, ws1, "Pedidos");
+  const ws2 = XLSX.utils.json_to_sheet(pedidos.flatMap(p => p.cotizacion.items.map(i => ({
+    Lote: p.lote, Cliente: p.cliente, "Fruta / producto": i.fruta, "Kg": +i.kg.toFixed(2),
+    "Precio por kg (COP)": Math.round(i.precioKg), "Paquetes": i.paquetes, "Subtotal (COP)": Math.round(i.subtotal),
+  }))));
+  XLSX.utils.book_append_sheet(wb, ws2, "Ítems cotizados");
+  const ws3 = XLSX.utils.json_to_sheet(pedidos.flatMap(p => p.seguimiento.map(s => ({
+    Lote: p.lote, Cliente: p.cliente, "Fecha y hora": s.cuando, Estado: s.estado, Nota: s.nota,
+  }))));
+  XLSX.utils.book_append_sheet(wb, ws3, "Seguimiento");
+  XLSX.writeFile(wb, `pedidos-produccion-${new Date().toISOString().slice(0, 10)}.xlsx`);
+});
+
+// ---- Análisis y estrategia de precios ----
+const promedio = arr => arr.length ? arr.reduce((s, x) => s + x, 0) / arr.length : 0;
+
+function recomendacionesFruta(f, lotes, comp) {
+  const recs = [];
+  const mg = promedio(lotes.map(r => r.margen || 0));
+  if (mg < 20) recs.push("Margen bajo (menos de 20 %): sube el precio o reduce costos.");
+  const porMes = agregarPorPeriodo(comp.map(c => ({ fecha: c.fecha, valor: c.valor, kg: c.kg })), "mes");
+  if (porMes.length >= 2) {
+    const ult = porMes[porMes.length - 1], ant = porMes[porMes.length - 2];
+    const v = (ult.precioKg - ant.precioKg) / ant.precioKg * 100;
+    if (v > 5) recs.push(`El precio de compra subió ${fmtN(v, 1)} % en el último mes: revisa el precio de venta o negocia con el proveedor.`);
+    if (v < -5) recs.push(`El precio de compra bajó ${fmtN(Math.abs(v), 1)} % en el último mes: puedes competir mejor en precio o subir el margen.`);
+  }
+  if (!comp.length) recs.push("Sin compras registradas: regístralas para ver la tendencia del precio de compra.");
+  const rendMin = Math.min(...lotes.map(r => r.rend || 0));
+  if (rendMin > 0 && rendMin < 15) recs.push(`Rendimiento bajo en algún lote (${fmtN(rendMin, 1)} %): revisa pelado, corte y tiempo de secado.`);
+  return recs.length ? recs : ["Sin alertas por ahora."];
+}
+
+function actualizarEstrategia() {
+  const frutas = nombresFrutas(base.map(r => r.fruta)).filter(f => base.some(r => norm(r.fruta) === norm(f)));
+  const sc = $("scFruta");
+  const prev = sc.value;
+  sc.innerHTML = "";
+  frutas.forEach(f => { const o = document.createElement("option"); o.value = f; o.textContent = f; sc.appendChild(o); });
+  if (prev && frutas.includes(prev)) sc.value = prev;
+
+  const m = num("estMargen");
+  const filas = frutas.map(f => {
+    const lotes = base.filter(r => norm(r.fruta) === norm(f));
+    const comp = compras.filter(c => norm(c.fruta) === norm(f));
+    const costo = promedio(lotes.map(r => r.costoKg || 0));
+    const precio = promedio(lotes.map(r => r.precioKg || 0));
+    const mg = promedio(lotes.map(r => r.margen || 0));
+    const kgC = comp.reduce((s, c) => s + c.kg, 0), valC = comp.reduce((s, c) => s + c.valor, 0);
+    const pCompra = kgC > 0 ? valC / kgC : null;
+    return { f, lotes: lotes.length, costo, precio, mg, pCompra, sugerido: conMargen(costo, m), recs: recomendacionesFruta(f, lotes, comp) };
+  });
+  $("estResumen").innerHTML = filas.length ? `
+    <div style="overflow-x:auto"><table class="small-table">
+      <thead><tr><th>Fruta</th><th class="num">Lotes</th><th class="num">Costo/kg</th><th class="num">Precio/kg actual</th>
+        <th class="num">Margen usado</th><th class="num">Compra/kg</th><th class="num">Precio sugerido/kg</th></tr></thead>
+      <tbody>${filas.map(x => `<tr><td>${x.f}</td><td class="num">${x.lotes}</td><td class="num">${fmt(x.costo)}</td>
+        <td class="num">${fmt(x.precio)}</td><td class="num">${fmtN(x.mg, 1)} %</td>
+        <td class="num">${x.pCompra === null ? "—" : fmt(x.pCompra)}</td><td class="num">${fmt(x.sugerido)}</td></tr>`).join("")}</tbody>
+    </table></div>
+    <h3>Recomendaciones</h3>
+    ${filas.map(x => `<p><b>${x.f}:</b></p><ul>${x.recs.map(r => `<li>${r}</li>`).join("")}</ul>`).join("")}`
+    : `<p class="hint">Guarda frutas calculadas en la sección 8 para ver el análisis.</p>`;
+  actualizarEscenario();
+}
+
+function actualizarEscenario() {
+  const f = $("scFruta").value;
+  const kg = num("scKg");
+  const cambio = evalExpr($("scCambio").value) || 0;
+  const m = num("scMargen");
+  const lotes = base.filter(r => norm(r.fruta) === norm(f));
+  if (!lotes.length) { $("scResultado").innerHTML = "<p class='hint'>Esta fruta no tiene lotes guardados en la base.</p>"; return; }
+  const costoActual = promedio(lotes.map(r => r.costoKg || 0));
+  const precioActual = promedio(lotes.map(r => r.precioKg || 0));
+  const costoEsc = costoActual * (1 + cambio / 100);
+  const precioSug = conMargen(costoEsc, m);
+  const utilLote = (precioSug - costoEsc) * kg;
+  $("scResultado").innerHTML = `
+    <table class="small-table">
+      <tbody>
+        <tr><td>Costo por kg actual (promedio de lotes)</td><td class="num">${fmt(costoActual)}</td></tr>
+        <tr><td>Costo por kg con el cambio</td><td class="num">${fmt(costoEsc)}</td></tr>
+        <tr><td>Precio de venta actual por kg (promedio)</td><td class="num">${fmt(precioActual)}</td></tr>
+        <tr class="tot-row"><td>Precio sugerido por kg con margen ${fmtN(m, 1)} %</td><td class="num">${fmt(precioSug)}</td></tr>
+        <tr><td>Diferencia frente al precio actual</td><td class="num">${fmt(precioSug - precioActual)}</td></tr>
+        <tr><td>Costo total del pedido de ${fmtN(kg, 2)} kg</td><td class="num">${fmt(costoEsc * kg)}</td></tr>
+        <tr><td>Precio total del pedido</td><td class="num">${fmt(precioSug * kg)}</td></tr>
+        <tr class="tot-row"><td>Utilidad del pedido</td><td class="num">${fmt(utilLote)}</td></tr>
+      </tbody>
+    </table>
+    <p class="hint">El precio sugerido usa el costo total por kg de la sección 7 de cada lote guardado. Si una fruta tiene lotes con costos distintos, se usa el promedio.</p>`;
+}
+["scFruta", "scKg", "scCambio", "scMargen"].forEach(id => $(id).addEventListener("input", actualizarEscenario));
+$("scFruta").addEventListener("change", actualizarEscenario);
+$("estMargen").addEventListener("input", actualizarEstrategia);
+
+// ---- Archivo único de datos (Chrome / Edge): cada guardado reemplaza el mismo archivo ----
+const SOPORTA_ARCHIVO = typeof window.showSaveFilePicker === "function";
+const CLAVES_DATOS = [KEY_BASE, "mezclas-v1", "empaques-v1", "compras-v1", "pedidos-v1"];
+let fileHandle = null;
+let escritura = Promise.resolve();
+
+function setEstadoArchivo(t) { $("estadoArchivo").textContent = t; }
+
+function idbOpen() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("costos-frutas", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("archivos");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function idbGet(k) {
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const q = db.transaction("archivos").objectStore("archivos").get(k);
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+}
+async function idbSet(k, v) {
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const t = db.transaction("archivos", "readwrite");
+    t.objectStore("archivos").put(v, k);
+    t.oncomplete = () => res();
+    t.onerror = () => rej(t.error);
+  });
+}
+
+function construirDatos() {
+  const datos = {};
+  CLAVES_DATOS.forEach(k => { datos[k] = localStorage.getItem(k); });
+  return { app: "costos-frutas", version: 1, guardado: new Date().toISOString(), datos };
+}
+
+// Reemplaza el contenido del archivo con los datos actuales (no crea archivos nuevos)
+function sincronizarArchivo() {
+  if (!fileHandle) return;
+  escritura = escritura.then(async () => {
+    try {
+      const w = await fileHandle.createWritable();
+      await w.write(JSON.stringify(construirDatos(), null, 1));
+      await w.close();
+      setEstadoArchivo(`Datos guardados en ${fileHandle.name} · ${new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}`);
+    } catch (e) {
+      setEstadoArchivo("No se pudo escribir el archivo: " + e.message);
+    }
+  });
+}
+
+// Lee el archivo y lo pasa a los datos del navegador
+async function leerArchivoEnLocal() {
+  const txt = await (await fileHandle.getFile()).text();
+  if (!txt.trim()) return false;
+  const obj = JSON.parse(txt);
+  if (obj.app !== "costos-frutas" || !obj.datos) throw new Error("El archivo no es de esta herramienta.");
+  CLAVES_DATOS.forEach(k => { if (obj.datos[k] !== null && obj.datos[k] !== undefined) localStorage.setItem(k, obj.datos[k]); });
+  return true;
+}
+
+function recargarTodo() {
+  cargarBaseLocal(); ordenarBase(); pintarBase(); llenarSelectCot();
+  cargarMezclasLocal(); pintarMezclas(); pintarEmpaques(); llenarSelMezclas();
+  cargarComprasLocal(); pintarCompras(); actualizarSelFrutasAnalisis();
+  cargarPedidosLocal(); actualizarPedidos(); actualizarEstrategia();
+}
+
+async function elegirArchivo() {
+  if (!SOPORTA_ARCHIVO) { alert("Esta opción funciona en Google Chrome o Microsoft Edge."); return; }
+  try {
+    const h = await window.showSaveFilePicker({
+      suggestedName: "datos-costos-frutas.json",
+      types: [{ description: "Datos de costos", accept: { "application/json": [".json"] } }],
+    });
+    fileHandle = h;
+    await idbSet("archivoDatos", h);
+    const tieneDatos = (await h.getFile()).size > 0;
+    if (tieneDatos && await leerArchivoEnLocal()) { recargarTodo(); }
+    else { sincronizarArchivo(); }
+    $("btnConectar").hidden = true;
+    setEstadoArchivo(`Datos guardados en ${h.name}`);
+  } catch (e) {
+    if (e.name !== "AbortError") alert("No se pudo usar el archivo: " + e.message);
+  }
+}
+
+async function conectarArchivo() {
+  try {
+    const p = await fileHandle.requestPermission({ mode: "readwrite" });
+    if (p !== "granted") { setEstadoArchivo("Permiso denegado. Pulsa \"Conectar archivo\" para intentarlo de nuevo."); return; }
+    $("btnConectar").hidden = true;
+    if (await leerArchivoEnLocal()) recargarTodo();
+    setEstadoArchivo(`Datos guardados en ${fileHandle.name}`);
+  } catch (e) {
+    alert("No se pudo conectar el archivo: " + e.message);
+  }
+}
+
+$("btnElegirArchivo").addEventListener("click", elegirArchivo);
+$("btnConectar").addEventListener("click", conectarArchivo);
+
+(async () => {
+  if (!SOPORTA_ARCHIVO) {
+    setEstadoArchivo("Modo navegador: los datos se guardan en este navegador. Para usar un solo archivo, abre la herramienta en Google Chrome o Microsoft Edge.");
+    $("btnElegirArchivo").hidden = true;
+    return;
+  }
+  try { fileHandle = (await idbGet("archivoDatos")) || null; } catch { fileHandle = null; }
+  if (!fileHandle) {
+    setEstadoArchivo("Sin archivo de datos. Pulsa \"Elegir archivo de datos\" para guardar todo en un solo archivo.");
+    return;
+  }
+  const perm = await fileHandle.queryPermission({ mode: "readwrite" });
+  if (perm !== "granted") {
+    setEstadoArchivo(`Archivo ${fileHandle.name} vinculado. Pulsa "Conectar archivo" para continuar.`);
+    $("btnConectar").hidden = false;
+    return;
+  }
+  try {
+    if (await leerArchivoEnLocal()) recargarTodo();
+    setEstadoArchivo(`Datos guardados en ${fileHandle.name}`);
+  } catch (e) {
+    setEstadoArchivo("No se pudo leer el archivo: " + e.message);
+  }
+})();
+
+$("mzAgregar") && null;
+cargarBaseLocal();
+ordenarBase();
+pintarBase();
+llenarSelectCot();
+pintarCot();
+cargarMezclasLocal();
+addIngRow();
+pintarMezclas();
+pintarEmpaques();
+llenarSelMezclas();
+actualizarMezclaPreview();
+cargarComprasLocal();
+cargarPedidosLocal();
+actualizarPedidos();
+$("pdFecha").value = new Date().toISOString().slice(0, 10);
+pintarCompras();
+prefillEmpaqueGramaje();
+$("cpFecha").value = new Date().toISOString().slice(0, 10);
+actualizarPrecioCompra();
+actualizarSelFrutasAnalisis();
+showTab("calc");
+calcular();
+</script>
+<script>
+if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+</body>
+</html>
